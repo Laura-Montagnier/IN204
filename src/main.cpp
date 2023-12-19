@@ -14,6 +14,8 @@ int main(int argc, const char *argv[]) {
     SDL_Event event;
     updateRender();
 
+
+    //Cette boucle sert à fermer la fenêtre en cliquant sur la petite croix.
     while (SDL_PollEvent(&event)) { // Empties event poll
     }
 
