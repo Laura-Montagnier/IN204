@@ -5,45 +5,40 @@
 
 class Vecteur {
 private:
-    double coordX;
-    double coordY;
-    double coordZ;
+    double X;
+    double Y;
+    double Z;
 
 public:
     //Constructeur
-    Vecteur(double x, double y, double z) : coordX(x), coordY(y), coordZ(z) {}
+    Vecteur(double x, double y, double z) : X(x), Y(y), Z(z) {}
 
     //Accesseurs
-    double getCoordX() const {return coordX; }
-    double getCoordY() const {return coordY; }
-    double getCoordZ() const {return coordZ; }
+    double getCoordX() const {return X; }
+    double getCoordY() const {return Y; }
+    double getCoordZ() const {return Z; }
 
     //Pour afficher les infos du vecteur
+     void print() const {
+        std::cout << "3 coordonées (" << coordX << ", " << coordY << ", " << coordZ << ") << std::endl;
+    }
 }
 
 
 class Sphere {
 private:
-    double centerX;
-    double centerY;
-    double centerZ;
-    double radius;
+    
 
 public:
+    Vecteur centre;
+    double radius;
+    
     // Constructeur
-    Sphere(double x, double y, double z, double r) : centerX(x), centerY(y), centerZ(z), radius(r) {}
-
-    // Accesseurs
-    double getCenterX() const { return centerX; }
-    double getCenterY() const { return centerY; }
-    double getCenterZ() const { return centerZ; }
-    double getRadius() const { return radius; }
-
-   
+    Sphere(double x, double y, double z, double r) : centre(Vecteur(X, Y, Z)), radius(r) {}
 
     // Afficher les informations de la sphère
-    void infoSphere() const {
-        std::cout << "Sphère de centre (" << centerX << ", " << centerY << ", " << centerZ << ") et de rayon " << radius << std::endl;
+    void print() const {
+        std::cout << "Sphère de centre (" << X << ", " << Y << ", " << Z << ") et de rayon " << radius << std::endl;
     }
 };
 
@@ -52,7 +47,7 @@ int main() {
     Sphere maSphere(1.0, 2.0, 3.0, 4.0);
 
     // Afficher les informations sur la sphère
-    maSphere.infoSphere();
+    maSphere.print();
 
    
     return 0;
