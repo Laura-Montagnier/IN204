@@ -39,7 +39,7 @@ void cleanup() {
     cleanup_graphics();
     SDL_Quit();
 
-    printf("Au revoir !\n\n");
+    printf("Bye bye !\n\n");
 
 
 }
