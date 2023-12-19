@@ -18,11 +18,6 @@ public:
     double getCenterZ() const { return centerZ; }
     double getRadius() const { return radius; }
 
-    // Méthode pour calculer le volume de la sphère
-    double calculateVolume() const {
-        return (4.0 / 3.0) * M_PI * std::pow(radius, 3);
-    }
-
     // Méthode pour afficher les informations sur la sphère
     void displaySphereInfo() const {
         std::cout << "Sphère de centre (" << centerX << ", " << centerY << ", " << centerZ
@@ -36,9 +31,6 @@ int main() {
 
     // Afficher les informations sur la sphère
     maSphere.displaySphereInfo();
-
-    // Calculer et afficher le volume de la sphère
-    std::cout << "Volume de la sphère : " << maSphere.calculateVolume() << std::endl;
 
     return 0;
 }
