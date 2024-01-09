@@ -20,9 +20,9 @@ public:
 
     //Pour afficher les infos du vecteur
      void print() const {
-        std::cout << "3 coordonées (" << coordX << ", " << coordY << ", " << coordZ << ") << std::endl;
+        std::cout << "3 coordonées (" << coordX << ", " << coordY << ", " << coordZ << ")" << std::endl;
     }
-}
+};
 
 
 class Sphere {
