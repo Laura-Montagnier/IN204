@@ -1,6 +1,4 @@
 #include "defs.hpp"
-#include <cmath>
-#include <iostream>
 
 class Vecteur {
 private:
@@ -9,36 +7,47 @@ public:
     double y;
     double z;
 
-    // Constructeur
-    Vecteur() : x(0), y(0), z(0){};
+    // Constructeurs
+    Vecteur() = default;
     Vecteur(double x, double y, double z) : x(x), y(y), z(z){};
-    Vecteur(Vecteur &autre) : x(autre.x), y(autre.y), z(autre.z){};
+    Vecteur(const Vecteur &) = default;
+    // Vecteur(const Vecteur &autre) : x(autre.x), y(autre.y), z(autre.z){};
 
-    // Pour afficher les infos du vecteur
-    void print() const {
-    }
-
-    Vecteur operator+(Vecteur autre) const {
+    // Operations sur les vecteurs
+    Vecteur operator+(const Vecteur autre) const { // Vecteur + Vecteur
         return Vecteur(x + autre.x, y + autre.y, z + autre.z);
     };
 
-    Vecteur operator*(double lambda) const {
+    Vecteur operator+=(const Vecteur autre) { // Vecteur =+ Vecteur
+        return *this = *this + autre;
+    };
+
+    Vecteur operator*(double lambda) const { // Vecteur * double
         return Vecteur(lambda * x, lambda * y, lambda * z);
     };
 
-    Vecteur operator-() const {
+    Vecteur operator*=(double lambda) { // Vecteur *= double
+        return *this = *this * lambda;
+    };
+
+    Vecteur operator-() const { // - Vecteur
         return (*this) * -1;
     };
 
-    Vecteur operator-(Vecteur autre) const {
+    Vecteur operator-(const Vecteur autre) const { // Vecteur - Vecteur
         return (*this) + (-autre);
+    };
+
+    Vecteur operator-=(const Vecteur autre) { // Vecteur -= Vecteur
+        return *this = *this - autre;
     };
 };
 
-Vecteur operator*(double lambda, const Vecteur vecteur) {
+Vecteur operator*(double lambda, const Vecteur vecteur) { // double * Vecteur
     return vecteur * lambda;
 }
 
+// Pour afficher les infos du vecteur
 std::ostream &operator<<(std::ostream &stream, const Vecteur &vecteur) {
     return stream << "Vecteur(" << vecteur.x << ", " << vecteur.y << ", " << vecteur.z << ")";
 }
@@ -49,13 +58,14 @@ public:
     Vecteur centre;
     double radius;
 
-    // Constructeur
+    // Constructeurs
+    Sphere() = default;
     Sphere(Vecteur point, double r) : centre(point), radius(r) {}
     Sphere(double x, double y, double z, double r) : centre(x, y, z), radius(r) {}
-    Sphere(Sphere &s) = default;
+    Sphere(const Sphere &) = default;
 };
 
-// Afficher les informations de la sphère
+// Affiche les informations de la sphère
 std::ostream &operator<<(std::ostream &stream, const Sphere &sphere) {
     return stream << "Sphère de centre " << sphere.centre << " et de rayon " << sphere.radius;
 }
@@ -66,12 +76,14 @@ public:
     Vecteur origine;
     Vecteur direction;
 
-    // Constructeur
+    // Constructeurs
+    Rayon() = default;
     Rayon(Vecteur origine, Vecteur direction) : origine(origine), direction(direction) {}
     Rayon(double x, double y, double z, double v_x, double v_y, double v_z) : origine(x, y, z), direction(v_x, v_y, v_z) {}
+    Rayon(const Rayon&) = default;
 };
 
 // Afficher les informations du rayon
 std::ostream &operator<<(std::ostream &stream, const Rayon &rayon) {
-    return stream << "Rayon d'origine" << rayon.origine << " et de direction " << rayon.direction << std::endl;
+    return stream << "Rayon d'origine " << rayon.origine << " et de direction " << rayon.direction;
 }
