@@ -6,35 +6,40 @@ class Camera{
 
 public:
 
-    Camera(){};
+    Vecteur position_camera; // centre optique, position du capteur
+    Vecteur direction_camera; // direction d'observation
 
-    int hauteur_ecran = 100;
-    int largeur_ecran = 200;
+    // v_x et v_y definissent le plan de l'ecran
+    Vecteur v_x;
+    Vecteur v_y;
 
-    double fov = 150;
+    // Le triplet (v_x, v_y, direction_camera) est une base orthogonale (normee ?) directe
+
+    Camera() : direction_camera(0, 0, 1), v_x(1, 0, 0), v_y(0, -1, 0) {};
 
 
-    int pixel_size = 1;
+    const int hauteur_ecran = 200; // taille verticale
+    const int largeur_ecran = 300; // taille horizontale
+
+    const double angle_vue = 90 * M_PI/180; // FOV, angle horizontal en radians entre la camera et les bords du cadre
+    const double distance_ecran = largeur_ecran / std::tan(angle_vue/2);
+    
+
+    const int taille_pixel = 1;
+    // La resolution est : (hauteur_ecran/taille_pixel) x (largeur_ecran/taille_pixel) 
 
 
-    void image(){
+    void image() {
 
-        Vecteur position_camera;
-        Vecteur direction_camera(0, 0, 1);
-        Vecteur v_x(1, 0, 0);
-        Vecteur v_y(0, 1, 0);
+        for (float y = -hauteur_ecran/2; y < hauteur_ecran/2; y += taille_pixel){
+            for (float x = -largeur_ecran/2; x < largeur_ecran/2; x += taille_pixel){
+                // Normaliser direction ?
+                Vecteur direction = direction_camera * distance_ecran + y * taille_pixel * v_x + x * taille_pixel * v_y;
+                // Vecteur point_ecran = position_camera + direction ;
+                Rayon rayon(position_camera, direction);
 
-        for (int x = -hauteur_ecran/2; x < hauteur_ecran/2; x++){
-            for (int y = largeur_ecran/2; y < largeur_ecran/2; y++){
-
-                2 * v_x;
-                v_x * 2;
-
-                Vecteur point_ecran = position_camera + direction_camera * fov + x * v_x + y * v_y;
-
-                Rayon rayon(position_camera, point_ecran - position_camera);
-                // TODO: faire un truc avec le rayon 
-
+                // TODO: faire un truc avec le rayon
+                // std::cout << "(xy:" << x << y << ") " << rayon << '\n';
             }
         }
     }
