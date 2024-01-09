@@ -42,6 +42,25 @@ public:
     }
 };
 
+class Rayon {
+private :
+public :
+    Vecteur origine;
+    Vecteur direction;
+
+    //Constructeur
+    Rayon(double x, double y, double z, double a, double b, double c) : origine(Vecteur(X, Y, Z)), direction(Vecteur(A, B, C)) {}
+
+    //Afficher les informations du rayon
+    void print() const {
+        std::cout << "Rayon d'origine ("<< X <<", " << Y << ", " << Z << ") et de direction ("<< A <<", " << B << ", " << C << ") << std::endl;
+     }
+
+
+};
+
+
+
 int main() {
     // Exemple d'utilisation de la classe Sphere
     Sphere maSphere(1.0, 2.0, 3.0, 4.0);
