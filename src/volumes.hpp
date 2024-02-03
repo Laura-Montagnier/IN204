@@ -46,7 +46,7 @@ public:
         return *this = *this - autre;
     };
 
-    double operator*(const Vecteur autre) { // Vecteur.Vecteur Produit scalaire
+    double operator*(const Vecteur autre) const { // Vecteur.Vecteur Produit scalaire
         return (x*autre.x)+(y*autre.y)+(z*autre.z);
     };
 
@@ -96,20 +96,17 @@ std::ostream &operator<<(std::ostream &stream, const Plan &plan) {
 
 
 bool calcul_intersection(const Rayon rayon, const Plan plan, Intersection intersection){
-    if (rayon .direction * plan.normale == 0){
+    if (rayon.direction * plan.normale == 0){
         intersection.existe = false;
         return false;
     }
 
-    else{
-        double t = (rayon.origine - plan.point) * plan.normale / (rayon.direction * plan.normale);
-    } 
+    double t = (rayon.origine - plan.point) * plan.normale / (rayon.direction * plan.normale);
     
-    Intersection.existe = true;
-    Intersection.point = point_intersection = rayon.origine + t * rayon.direction;
-    Intersection.direction = rayon.direction;
-    return Intersection(point_intersection, rayon.direction);
-
+    intersection.existe = true;
+    intersection.point = rayon.origine + t * rayon.direction;
+    intersection.direction = rayon.direction;
+    return true;
 }
 
 
@@ -137,6 +134,7 @@ std::ostream &operator<<(std::ostream &stream, const Rayon &rayon) {
 class Intersection {
 private:
 public:
+    bool existe;
     Vecteur point;
     Vecteur direction;
 
@@ -148,6 +146,6 @@ public:
 };
 
 // Afficher les informations de l'intersection
-std::ostream &operator<<(std::ostream &stream, const Rayon &rayon) {
+std::ostream &operator<<(std::ostream &stream, const Intersection &intersection) {
     return stream << "Point d'intersection" << intersection.point << "issu du rayon" << intersection.direction;
 }
