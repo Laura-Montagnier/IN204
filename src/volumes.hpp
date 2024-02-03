@@ -1,3 +1,4 @@
+#pragma once
 #include "defs.hpp"
 
 class Vecteur {
@@ -20,10 +21,6 @@ public:
 
     Vecteur operator+=(const Vecteur autre) { // Vecteur =+ Vecteur
         return *this = *this + autre;
-    };
-
-    Vecteur operator*(double lambda) const { // Vecteur * double
-        return Vecteur(lambda * x, lambda * y, lambda * z);
     };
 
     Vecteur operator*(double lambda) const { // Vecteur * double
@@ -60,56 +57,6 @@ Vecteur operator*(double lambda, const Vecteur vecteur) { // double * Vecteur
 std::ostream &operator<<(std::ostream &stream, const Vecteur &vecteur) {
     return stream << "Vecteur(" << vecteur.x << ", " << vecteur.y << ", " << vecteur.z << ")";
 }
-
-class Sphere {
-private:
-public:
-    Vecteur centre;
-    double radius;
-
-    // Constructeurs
-    Sphere() = default;
-    Sphere(Vecteur point, double r) : centre(point), radius(r) {}
-    Sphere(double x, double y, double z, double r) : centre(x, y, z), radius(r) {}
-    Sphere(const Sphere &) = default;
-};
-
-// Affiche les informations de la sphère
-std::ostream &operator<<(std::ostream &stream, const Sphere &sphere) {
-    return stream << "Sphère de centre " << sphere.centre << " et de rayon " << sphere.radius;
-}
-
-class Plan {
-private:
-public:
-    Vecteur point;
-    Vecteur normale;
-
-    // Constructeurs
-    Plan(Vecteur p, Vecteur n) : point(p), normale(n) {}
-    Plan(const Plan &) = default;
-};
-
-std::ostream &operator<<(std::ostream &stream, const Plan &plan) {
-    return stream << "Plan passant par " << plan.point << " et de normale " << plan.normale;
-}
-
-
-bool calcul_intersection(const Rayon rayon, const Plan plan, Intersection intersection){
-    if (rayon.direction * plan.normale == 0){
-        intersection.existe = false;
-        return false;
-    }
-
-    double t = (rayon.origine - plan.point) * plan.normale / (rayon.direction * plan.normale);
-    
-    intersection.existe = true;
-    intersection.point = rayon.origine + t * rayon.direction;
-    intersection.direction = rayon.direction;
-    return true;
-}
-
-
 
 
 class Rayon {
@@ -148,4 +95,66 @@ public:
 // Afficher les informations de l'intersection
 std::ostream &operator<<(std::ostream &stream, const Intersection &intersection) {
     return stream << "Point d'intersection" << intersection.point << "issu du rayon" << intersection.direction;
+}
+
+
+class Sphere {
+private:
+public:
+    Vecteur centre;
+    double radius;
+
+    // Constructeurs
+    Sphere() = default;
+    Sphere(Vecteur point, double r) : centre(point), radius(r) {}
+    Sphere(double x, double y, double z, double r) : centre(x, y, z), radius(r) {}
+    Sphere(const Sphere &) = default;
+};
+
+// Affiche les informations de la sphère
+std::ostream &operator<<(std::ostream &stream, const Sphere &sphere) {
+    return stream << "Sphère de centre " << sphere.centre << " et de rayon " << sphere.radius;
+}
+
+class Plan {
+private:
+public:
+    Vecteur point;
+    Vecteur normale;
+
+    // Constructeurs
+    Plan(Vecteur p, Vecteur n) : point(p), normale(n) {}
+    Plan(const Plan &) = default;
+};
+
+std::ostream &operator<<(std::ostream &stream, const Plan &plan) {
+    return stream << "Plan passant par " << plan.point << " et de normale " << plan.normale;
+}
+
+
+bool calcul_intersection(const Rayon rayon, const Plan plan, Intersection &intersection){
+    // std::cout << rayon << plan <<"\n";
+    // std::cout << "produit scalaire" << rayon.direction * plan.normale <<"\n";
+
+    if (rayon.direction * plan.normale == 0){
+        // std::cout << "a\n" ;
+        intersection.existe = false;
+        return false;
+    }
+
+    double t = - (rayon.origine - plan.point) * plan.normale / (rayon.direction * plan.normale);
+    
+    // t = 1;
+
+    // std::cout << "t" << t << "\n";
+
+    if( t <= 0){
+        intersection.existe = false;
+        return false;
+    }
+
+    intersection.existe = true;
+    intersection.point = rayon.origine + t * rayon.direction;
+    intersection.direction = rayon.direction;
+    return true;
 }

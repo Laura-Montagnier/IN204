@@ -1,3 +1,4 @@
+#pragma once
 #include "defs.hpp"
 #include "graphics.hpp"
 

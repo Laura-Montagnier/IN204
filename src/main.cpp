@@ -9,9 +9,26 @@ int main(int argc, const char *argv[]) {
 
     // Set to ~60 fps.
     // 1000 ms/ 60 fps = 1/16 s^2/frame
-        SDL_Delay(16);
+    SDL_Delay(16);
 
     SDL_Event event;
+    updateRender();
+
+    Camera camera;
+    camera.image();
+
+    // Rayon rayon(0, 0, 0, 0, 0, 1);
+    // Intersection i;
+    // calcul_intersection(rayon, plan, i);
+    // std::cout<< i.existe << i << "\n";
+
+
+
+    // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    // SDL_Rect rect;
+    // rect.x = rect.y = rect.h = rect.w = 20;
+    // SDL_RenderDrawRect(renderer, &rect);
+
     updateRender();
 
 
