@@ -79,7 +79,6 @@ std::ostream &operator<<(std::ostream &stream, const Sphere &sphere) {
     return stream << "Sphère de centre " << sphere.centre << " et de rayon " << sphere.radius;
 }
 
-
 class Plan {
 private:
 public:
@@ -96,9 +95,10 @@ std::ostream &operator<<(std::ostream &stream, const Plan &plan) {
 }
 
 
-Intersection calcul_intersection(const Rayon rayon, const Plan plan, Intersection intersection){
+bool calcul_intersection(const Rayon rayon, const Plan plan, Intersection intersection){
     if (rayon .direction * plan.normale == 0){
         intersection.existe = false;
+        return false;
     }
 
     else{
@@ -131,4 +131,23 @@ public:
 // Afficher les informations du rayon
 std::ostream &operator<<(std::ostream &stream, const Rayon &rayon) {
     return stream << "Rayon d'origine " << rayon.origine << " et de direction " << rayon.direction;
+}
+
+
+class Intersection {
+private:
+public:
+    Vecteur point;
+    Vecteur direction;
+
+    // Constructeurs
+    Intersection() = default;
+    Intersection(Vecteur point, Vecteur direction) : point(point), direction(direction) {}
+    Intersection(double x, double y, double z, double v_x, double v_y, double v_z) : point(x, y, z), direction(v_x, v_y, v_z) {}
+    Intersection(const Intersection&) = default;
+};
+
+// Afficher les informations de l'intersection
+std::ostream &operator<<(std::ostream &stream, const Rayon &rayon) {
+    return stream << "Point d'intersection" << intersection.point << "issu du rayon" << intersection.direction;
 }
