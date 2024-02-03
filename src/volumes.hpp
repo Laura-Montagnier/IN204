@@ -43,7 +43,7 @@ public:
     };
 
     Double operator*=(const Vecteur autre) { // Vecteur.Vecteur Produit scalaire
-        return (x*autre.x)+(y*autre.y)+(z + autre.z)
+        return (x*autre.x)+(y*autre.y)+(z + autre.z);
     };
 
     Double operator*=(const Vecteur autre) {
