@@ -63,12 +63,17 @@ public:
     Sphere(Vecteur point, double r) : centre(point), radius(r) {}
     Sphere(double x, double y, double z, double r) : centre(x, y, z), radius(r) {}
     Sphere(const Sphere &) = default;
+
+    Intersection calcul_intersection (Rayon rayon; Sphere sphere){
+        
+    }
 };
 
 // Affiche les informations de la sphère
 std::ostream &operator<<(std::ostream &stream, const Sphere &sphere) {
     return stream << "Sphère de centre " << sphere.centre << " et de rayon " << sphere.radius;
 }
+
 
 class Rayon {
 private:
