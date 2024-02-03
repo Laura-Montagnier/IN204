@@ -45,6 +45,14 @@ public:
     Vecteur operator-=(const Vecteur autre) { // Vecteur -= Vecteur
         return *this = *this - autre;
     };
+
+    Double operator*=(const Vecteur autre) { // Vecteur.Vecteur Produit scalaire
+        return (x*autre.x)+(y*autre.y)+(z + autre.z);
+    };
+
+    Double operator*=(const Vecteur autre) {
+        return *this = *this * autre;
+    };
 };
 
 Vecteur operator*(double lambda, const Vecteur vecteur) { // double * Vecteur

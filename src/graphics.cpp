@@ -1,7 +1,7 @@
 #include "graphics.hpp"
 
 SDL_Window *window;
-SDL_Renderer *render;
+SDL_Renderer *renderer;
 SDL_Texture *display;
 TTF_Font *font;
 
@@ -14,10 +14,10 @@ bool init_graphics() {
                               WINDOW_WIDTH, WINDOW_HEIGHT,
                               SDL_WINDOW_SHOWN);
 
-    render = SDL_CreateRenderer(window, -1,
+    renderer = SDL_CreateRenderer(window, -1,
                                 SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    if (window == NULL || render == NULL) {
+    if (window == NULL || renderer == NULL) {
         success = false;
         fprintf(stderr,
                 "\nUnable to open the window: %s\n",
@@ -28,13 +28,13 @@ bool init_graphics() {
 }
 
 void updateRender() {
-    SDL_SetRenderTarget(render, display);
-    SDL_RenderPresent(render);
+    SDL_SetRenderTarget(renderer, display);
+    SDL_RenderPresent(renderer);
 }
 
 
 void cleanup_graphics() {
-    SDL_DestroyRenderer(render);
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_CloseFont(font);
     TTF_Quit();
