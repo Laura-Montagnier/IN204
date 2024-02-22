@@ -1,8 +1,20 @@
 #include "camera.hpp"
 
-Vecteur point(0, 0, 0);
-Vecteur normale(.1, 0, 1);
-Plan plan(point, normale);
+Vecteur point{0, 0, 0};
+Vecteur normale{.1, 0, 1};
+Plan plan{point, normale};
+
+Union monde{plan}; // objet contenant toute la scène 3d
+
+Vecteur direction_lumiere{0, .4, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
+
+Vecteur couleur_ciel{0, 180, 255}; // à adapter avec un type couleur ?
+Vecteur couleur_sol{120, 100, 80};
+
+void colore_pixel(Vecteur couleur, int i, int j) {
+    SDL_SetRenderDrawColor(renderer, couleur.x, couleur.y, couleur.z, 255);
+    SDL_RenderDrawPoint(renderer, j, i);
+}
 
 Camera::Camera() : position_camera(0, 0, 1),
                    direction_camera(0, 1, 0),
@@ -16,7 +28,11 @@ Camera::Camera() : position_camera(0, 0, 1),
                    centre_ecran(position_camera + distance_ecran * direction_camera){};
 
 void Camera::image() {
+    direction_lumiere *= 1 / (direction_lumiere * direction_lumiere);
+
     std::cout << "camera.image()\n";
+
+    std::cout << "normale*lumiere: " << plan.normale * direction_lumiere << "\n";
 
     for (int i = 0; i < hauteur_ecran; i += 1) {
         for (int j = 0; j < largeur_ecran; j += 1) {
@@ -27,17 +43,23 @@ void Camera::image() {
 
             Rayon rayon(position_camera, point_ecran - position_camera);
 
-            // TODO: faire interagir le rayon avec la scène 3d
-
             Intersection intersection;
-            calcul_intersection(rayon, plan, intersection);
+            monde.calcule_intersection(rayon, intersection);
 
+            Vecteur couleur;
             if (intersection.existe) {
-                SDL_SetRenderDrawColor(renderer, 120, 100, 80, 255);
+                // couleur = rayon.couleur ...
+
+                couleur = couleur_sol;
+                // l'intensité varie avec cos(angle(normale,lumiere))
+                couleur *= std::max(0., intersection.normale * direction_lumiere);
             } else {
-                SDL_SetRenderDrawColor(renderer, 0, 180, 255, 255);
+                // couleur = get_ambiant_light ...
+                couleur = couleur_ciel;
             }
-            SDL_RenderDrawPoint(renderer, j, i);
+            // Vecteur couleur = intersection.existe * couleur_sol + !intersection.existe * couleur_ciel;
+
+            colore_pixel(couleur, i, j);
         }
     }
 }
