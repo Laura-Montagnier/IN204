@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 #define WINDOW_WIDTH 300
 #define WINDOW_HEIGHT 200

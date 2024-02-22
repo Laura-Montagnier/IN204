@@ -72,14 +72,21 @@ protected:
     Objet() = default;
 
 public:
-    virtual bool calcule_intersection(const Rayon &, Intersection &) const;
+    virtual bool calcule_intersection(const Rayon &, Intersection &) const = 0;
 };
 
 class Union : public Objet, public std::vector<Objet *> {
     // Vecteur contenant des pointeurs sur des Objets
 public:
-    Union(std::initializer_list<Objet *>);
-    void ajoute(std::initializer_list<Objet *>);
+    void ajoute(Objet &objet);
+
+    template <typename... Args>
+    void ajoute(Objet &objet, Args &...args);
+
+    Union(Objet &objet);
+
+    template <typename... Args>
+    Union(Objet &objet, Args &...args);
 
     virtual bool calcule_intersection(const Rayon &, Intersection &) const;
 };
