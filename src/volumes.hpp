@@ -110,3 +110,5 @@ public:
     Materiau(const Materiau &) = default;
 };
 
+inline std::ostream &operator<<(std::ostream &, const Materiau &);
+
