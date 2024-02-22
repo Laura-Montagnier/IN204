@@ -67,6 +67,9 @@ public:
 // Afficher les informations de l'intersection
 inline std::ostream &operator<<(std::ostream &, const Intersection &);
 
+
+
+
 class Objet {
 protected:
     Objet() = default;
@@ -124,6 +127,25 @@ public:
 
 inline std::ostream &operator<<(std::ostream &, const Plan &);
 
-bool calcul_intersection(const Rayon &, const Plan &, Intersection &);
 
-bool calcul_intersection(const Rayon &, const Union &, Intersection &);
+
+
+
+class Materiau {
+private:
+public:
+    Vecteur couleur;
+
+    //Constructeurs
+
+    Materiau() = default;
+    Materiau(const Vecteur point) : couleur(point) {}
+    Materiau(double r, double g, double b) : couleur(r, g, b){}
+    
+    //Remarque pour plus tard : est-ce qu'il faudrait pas renvoyer des erreurs si on est en dehors de 0 et 258 ?
+
+    Materiau(const Materiau &) = default;
+};
+
+inline std::ostream &operator<<(std::ostream &, const Materiau &);
+
