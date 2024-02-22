@@ -1,6 +1,9 @@
 #pragma once
 #include "defs.hpp"
 
+template <typename T>
+int sign(T x);
+
 class Vecteur {
 private:
 public:
@@ -25,7 +28,6 @@ public:
 };
 
 Vecteur operator*(double, const Vecteur);
-
 
 // Pour afficher les infos du vecteur
 inline std::ostream &operator<<(std::ostream &, const Vecteur &);
@@ -52,18 +54,37 @@ public:
     bool existe;
     Vecteur point;
     Vecteur direction;
+    Vecteur normale;
+    double distance;
 
     // Constructeurs
-    Intersection() = default;
-    Intersection(const Vecteur point, const Vecteur direction) : point(point), direction(direction) {}
-    Intersection(double x, double y, double z, double v_x, double v_y, double v_z) : point(x, y, z), direction(v_x, v_y, v_z) {}
+    Intersection() : existe(false){};
+    // Intersection(const Vecteur point, const Vecteur direction) : point(point), direction(direction) {}
+    // Intersection(double x, double y, double z, double v_x, double v_y, double v_z) : point(x, y, z), direction(v_x, v_y, v_z) {}
     Intersection(const Intersection &) = default;
 };
 
 // Afficher les informations de l'intersection
 inline std::ostream &operator<<(std::ostream &, const Intersection &);
 
-class Sphere {
+class Objet {
+protected:
+    Objet() = default;
+
+public:
+    virtual bool calcule_intersection(const Rayon &, Intersection &) const;
+};
+
+class Union : public Objet, public std::vector<Objet *> {
+    // Vecteur contenant des pointeurs sur des Objets
+public:
+    Union(std::initializer_list<Objet *>);
+    void ajoute(std::initializer_list<Objet *>);
+
+    virtual bool calcule_intersection(const Rayon &, Intersection &) const;
+};
+
+class Sphere : public Objet {
 private:
 public:
     Vecteur centre;
@@ -74,12 +95,14 @@ public:
     Sphere(const Vecteur point, double r) : centre(point), radius(r) {}
     Sphere(double x, double y, double z, double r) : centre(x, y, z), radius(r) {}
     Sphere(const Sphere &) = default;
+
+    virtual bool calcule_intersection(const Rayon &, Intersection &) const;
 };
 
 // Affiche les informations de la sphère
 inline std::ostream &operator<<(std::ostream &, const Sphere &);
 
-class Plan {
+class Plan : public Objet {
 private:
 public:
     Vecteur point;
@@ -88,8 +111,12 @@ public:
     // Constructeurs
     Plan(const Vecteur p, const Vecteur n) : point(p), normale(n) {}
     Plan(const Plan &) = default;
+
+    virtual bool calcule_intersection(const Rayon &, Intersection &) const;
 };
 
 inline std::ostream &operator<<(std::ostream &, const Plan &);
 
 bool calcul_intersection(const Rayon &, const Plan &, Intersection &);
+
+bool calcul_intersection(const Rayon &, const Union &, Intersection &);

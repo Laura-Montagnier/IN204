@@ -1,5 +1,11 @@
 #include "volumes.hpp"
 
+template <typename T>
+int sign(T x) {
+    // -1, 0 ou 1
+    return (x > 0) - (x < 0);
+}
+
 // Opérations sur les vecteurs
 
 Vecteur Vecteur::operator+(const Vecteur autre) const { // Vecteur + Vecteur
@@ -38,6 +44,19 @@ Vecteur operator*(double lambda, const Vecteur vecteur) { // double * Vecteur
     return vecteur * lambda;
 }
 
+// Opérations sur les unions
+
+Union::Union(std::initializer_list<Objet *> list) {
+    for (auto &objet : list) {
+        push_back(objet);
+    }
+}
+
+void Union::ajoute(std::initializer_list<Objet *> list) {
+    for (auto &objet : list) {
+        push_back(objet);
+    }
+};
 
 // Affichage avec stream pour les différents objets
 
@@ -61,19 +80,37 @@ inline std::ostream &operator<<(std::ostream &stream, const Plan &plan) {
     return stream << "Plan passant par " << plan.point << " et de normale " << plan.normale;
 }
 
-
 // calcul d'intersection rayon-objet
 
-bool calcul_intersection(const Rayon& rayon, const Plan& plan, Intersection &intersection){
+bool Objet::calcule_intersection(const Rayon &rayon, Intersection &intersection) const {
+    std::cout << "Err should be called from subclass, not Objet\n";
+    throw; // should be pure virtual ?
+}
 
-    if (rayon.direction * plan.normale == 0){
+bool Union::calcule_intersection(const Rayon &rayon, Intersection &intersection) const {
+    double min_distance;
+    Intersection inter;
+    bool resultat = false;
+    for (auto &objet : (*this)) {
+        resultat |= objet->calcule_intersection(rayon, inter); // overriding : Union doit contenir des pointeurs ou références
+        if (inter.existe && inter.distance < min_distance) {
+            min_distance = inter.distance;
+            intersection = inter; // .copy() ?
+        }
+    }
+    return resultat;
+}
+
+bool Plan::calcule_intersection(const Rayon &rayon, Intersection &intersection) const {
+
+    if (rayon.direction * normale == 0) {
         intersection.existe = false;
         return false;
     }
 
-    double t = - (rayon.origine - plan.point) * plan.normale / (rayon.direction * plan.normale);
-    
-    if(t <= 0){
+    double t = -(rayon.origine - point) * normale / (rayon.direction * normale);
+
+    if (t <= 0) {
         intersection.existe = false;
         return false;
     }
@@ -81,5 +118,6 @@ bool calcul_intersection(const Rayon& rayon, const Plan& plan, Intersection &int
     intersection.existe = true;
     intersection.point = rayon.origine + t * rayon.direction;
     intersection.direction = rayon.direction;
+    intersection.normale = normale * -sign(normale * rayon.direction);
     return true;
 }
