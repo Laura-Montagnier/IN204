@@ -25,6 +25,9 @@ public:
     Vecteur operator-(const Vecteur) const;
     Vecteur operator-=(const Vecteur);
     double operator*(const Vecteur) const; // produit scalaire
+
+    double norme2() const;
+    double norme() const;
 };
 
 Vecteur operator*(double, const Vecteur);
@@ -66,9 +69,6 @@ public:
 
 // Afficher les informations de l'intersection
 std::ostream &operator<<(std::ostream &, const Intersection &);
-
-
-
 
 class Objet {
 protected:
@@ -120,25 +120,20 @@ public:
 
 std::ostream &operator<<(std::ostream &, const Plan &);
 
-
-
-
-
 class Materiau {
 private:
 public:
     Vecteur couleur;
 
-    //Constructeurs
+    // Constructeurs
 
     Materiau() = default;
     Materiau(const Vecteur point) : couleur(point) {}
-    Materiau(double r, double g, double b) : couleur(r, g, b){}
-    
-    //Remarque pour plus tard : est-ce qu'il faudrait pas renvoyer des erreurs si on est en dehors de 0 et 258 ?
+    Materiau(double r, double g, double b) : couleur(r, g, b) {}
+
+    // Remarque pour plus tard : est-ce qu'il faudrait pas renvoyer des erreurs si on est en dehors de 0 et 258 ?
 
     Materiau(const Materiau &) = default;
 };
 
 std::ostream &operator<<(std::ostream &, const Materiau &);
-

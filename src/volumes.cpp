@@ -44,6 +44,14 @@ Vecteur operator*(double lambda, const Vecteur vecteur) { // double * Vecteur
     return vecteur * lambda;
 }
 
+double Vecteur::norme2() const {
+    return (*this) * (*this);
+}
+
+double Vecteur::norme() const {
+    return sqrt(norme2());
+}
+
 // Opérations sur les unions
 
 Union::Union(std::initializer_list<Objet *> liste) {
@@ -160,7 +168,7 @@ bool Plan::calcul_intersection(const Rayon &rayon, Intersection &intersection) c
     intersection.existe = true;
     intersection.point = rayon.origine + t * rayon.direction;
     intersection.direction = rayon.direction;
-    intersection.normale = normale * -sign(normale * rayon.direction);
+    intersection.normale = normale; // * -sign(normale * rayon.direction);
     intersection.distance = t; //  t / norme(vitesse) ?
     return true;
 }
