@@ -7,7 +7,6 @@ Plan plan{point, normale};
 Sphere sphere(0, 8, 1, 1);
 Sphere s2(-.4, 4, 1, .2);
 
-
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
 Union monde{&sphere, &plan, &s2};
 
@@ -17,6 +16,12 @@ Vecteur direction_lumiere{1, -1, 1}; // vecteur pointant vers le soleil (source 
 Vecteur couleur_sol{0, 255, 0};
 
 void colore_pixel(Vecteur couleur, int i, int j) {
+    // correction gamma
+    couleur.x = sqrt(couleur.x / 255) * 255;
+    couleur.y = sqrt(couleur.y / 255) * 255;
+    couleur.z = sqrt(couleur.z / 255) * 255;
+
+
     SDL_SetRenderDrawColor(renderer, couleur.x, couleur.y, couleur.z, 255);
     SDL_RenderDrawPoint(renderer, j, i);
 }
@@ -36,7 +41,7 @@ Camera::Camera() : position_camera(0, 0, 1),
                    hauteur_ecran(WINDOW_HEIGHT),
                    taille_pixel(.01),
                    angle_vue(70 * M_PI / 180),
-                   distance_ecran(largeur_ecran*taille_pixel / std::tan(angle_vue / 2)),
+                   distance_ecran(largeur_ecran * taille_pixel / std::tan(angle_vue / 2)),
                    centre_ecran(position_camera + distance_ecran * direction_camera){};
 
 void Camera::image() {
