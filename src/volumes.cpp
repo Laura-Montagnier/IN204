@@ -58,39 +58,39 @@ void Union::ajoute(std::initializer_list<Objet *> liste) {
 
 // Affichage avec stream pour les différents objets
 
-inline std::ostream &operator<<(std::ostream &stream, const Vecteur &vecteur) {
+std::ostream &operator<<(std::ostream &stream, const Vecteur &vecteur) {
     return stream << "Vecteur(" << vecteur.x << ", " << vecteur.y << ", " << vecteur.z << ")";
 }
 
-inline std::ostream &operator<<(std::ostream &stream, const Rayon &rayon) {
+std::ostream &operator<<(std::ostream &stream, const Rayon &rayon) {
     return stream << "Rayon d'origine " << rayon.origine << " et de direction " << rayon.direction;
 }
 
-inline std::ostream &operator<<(std::ostream &stream, const Intersection &intersection) {
+std::ostream &operator<<(std::ostream &stream, const Intersection &intersection) {
     return stream << "Point d'intersection" << intersection.point << "issu du rayon" << intersection.direction;
 }
 
-inline std::ostream &operator<<(std::ostream &stream, const Sphere &sphere) {
+std::ostream &operator<<(std::ostream &stream, const Sphere &sphere) {
     return stream << "Sphère de centre " << sphere.centre << " et de rayon " << sphere.radius;
 }
 
-inline std::ostream &operator<<(std::ostream &stream, const Plan &plan) {
+std::ostream &operator<<(std::ostream &stream, const Plan &plan) {
     return stream << "Plan passant par " << plan.point << " et de normale " << plan.normale;
 }
 
 // calcul d'intersection rayon-objet
 
-bool Objet::calcule_intersection(const Rayon &rayon, Intersection &intersection) const {
+bool Objet::calcul_intersection(const Rayon &rayon, Intersection &intersection) const {
     std::cout << "Err should be called from subclass, not Objet\n";
     throw; // should be pure virtual ?
 }
 
-bool Union::calcule_intersection(const Rayon &rayon, Intersection &intersection) const {
-    double min_distance;
+bool Union::calcul_intersection(const Rayon &rayon, Intersection &intersection) const {
+    double min_distance = INFINITY;
     Intersection inter;
     bool resultat = false;
     for (auto &objet : (*this)) {
-        resultat |= objet->calcule_intersection(rayon, inter); // overriding : Union doit contenir des pointeurs ou références
+        resultat |= objet->calcul_intersection(rayon, inter); // overriding : Union doit contenir des pointeurs ou références
         if (inter.existe && inter.distance < min_distance) {
             min_distance = inter.distance;
             intersection = inter; // .copy() ?
@@ -99,7 +99,51 @@ bool Union::calcule_intersection(const Rayon &rayon, Intersection &intersection)
     return resultat;
 }
 
-bool Plan::calcule_intersection(const Rayon &rayon, Intersection &intersection) const {
+bool Sphere::calcul_intersection(const Rayon &rayon, Intersection &intersection) const {
+    // std::cout << rayon << *this <<"\n";
+    // std::cout << "produit scalaire" << rayon.direction * sphere....? <<"\n";
+
+    Vecteur D = rayon.direction;
+    Vecteur O = rayon.origine;
+    Vecteur C = centre;
+    double R = radius;
+
+    double a = D * D;
+    double b = 2 * D * (O - C);
+    double c = (O - C) * (O - C) - R * R;
+    double delta = b * b - 4 * a * c;
+    double t;
+
+    // std::cout << a << "\n";
+    // std::cout << b << "\n";
+    // std::cout << c << "\n";
+    // std::cout << delta << "\n";
+
+    if (delta < 0) {
+        // std::cout << "a\n" ;
+        intersection.existe = false;
+        return false;
+    } else if (delta == 0) {
+        t = -b / (2 * a);
+    } else { // delta < 0
+        // Il faut gérer le cas négatif, là je n'ai fait que l'intersection la plus proche au pif, oups
+        t = (-b - sqrt(delta)) / (2 * a);
+    }
+
+    intersection.existe = true;
+    intersection.point = O + t * D;
+    intersection.direction = rayon.direction;
+    intersection.distance = t; //  D normalisé ?
+    // std::cout << "dist " << intersection.distance << "\n";
+
+    intersection.normale = (intersection.point - C) * (1 / R);
+    // std::cout << "pt " << intersection.point << "\n";
+
+    // std::cout << "normsq " << intersection.normale * intersection.normale << "\n";
+    return true;
+}
+
+bool Plan::calcul_intersection(const Rayon &rayon, Intersection &intersection) const {
 
     if (rayon.direction * normale == 0) {
         intersection.existe = false;
@@ -117,5 +161,6 @@ bool Plan::calcule_intersection(const Rayon &rayon, Intersection &intersection) 
     intersection.point = rayon.origine + t * rayon.direction;
     intersection.direction = rayon.direction;
     intersection.normale = normale * -sign(normale * rayon.direction);
+    intersection.distance = t; //  t / norme(vitesse) ?
     return true;
 }

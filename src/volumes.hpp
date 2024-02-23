@@ -30,7 +30,7 @@ public:
 Vecteur operator*(double, const Vecteur);
 
 // Pour afficher les infos du vecteur
-inline std::ostream &operator<<(std::ostream &, const Vecteur &);
+std::ostream &operator<<(std::ostream &, const Vecteur &);
 
 class Rayon {
 private:
@@ -46,7 +46,7 @@ public:
 };
 
 // Afficher les informations du rayon
-inline std::ostream &operator<<(std::ostream &, const Rayon &);
+std::ostream &operator<<(std::ostream &, const Rayon &);
 
 class Intersection {
 private:
@@ -65,7 +65,7 @@ public:
 };
 
 // Afficher les informations de l'intersection
-inline std::ostream &operator<<(std::ostream &, const Intersection &);
+std::ostream &operator<<(std::ostream &, const Intersection &);
 
 
 
@@ -75,7 +75,7 @@ protected:
     Objet() = default;
 
 public:
-    virtual bool calcule_intersection(const Rayon &, Intersection &) const = 0;
+    virtual bool calcul_intersection(const Rayon &, Intersection &) const = 0;
 };
 
 class Union : public Objet, public std::vector<Objet *> {
@@ -84,7 +84,7 @@ public:
     Union(std::initializer_list<Objet *>);
     void ajoute(std::initializer_list<Objet *>);
 
-    virtual bool calcule_intersection(const Rayon &, Intersection &) const;
+    virtual bool calcul_intersection(const Rayon &, Intersection &) const;
 };
 
 class Sphere : public Objet {
@@ -99,11 +99,11 @@ public:
     Sphere(double x, double y, double z, double r) : centre(x, y, z), radius(r) {}
     Sphere(const Sphere &) = default;
 
-    virtual bool calcule_intersection(const Rayon &, Intersection &) const;
+    virtual bool calcul_intersection(const Rayon &, Intersection &) const;
 };
 
 // Affiche les informations de la sphère
-inline std::ostream &operator<<(std::ostream &, const Sphere &);
+std::ostream &operator<<(std::ostream &, const Sphere &);
 
 class Plan : public Objet {
 private:
@@ -115,10 +115,10 @@ public:
     Plan(const Vecteur p, const Vecteur n) : point(p), normale(n) {}
     Plan(const Plan &) = default;
 
-    virtual bool calcule_intersection(const Rayon &, Intersection &) const;
+    virtual bool calcul_intersection(const Rayon &, Intersection &) const;
 };
 
-inline std::ostream &operator<<(std::ostream &, const Plan &);
+std::ostream &operator<<(std::ostream &, const Plan &);
 
 
 
@@ -140,43 +140,5 @@ public:
     Materiau(const Materiau &) = default;
 };
 
-inline std::ostream &operator<<(std::ostream &, const Materiau &);
+std::ostream &operator<<(std::ostream &, const Materiau &);
 
-
-bool calcul_intersection(const Rayon rayon, const Sphere sphere, Intersection &intersection){
-    // std::cout << rayon << sphere <<"\n";
-    // std::cout << "produit scalaire" << rayon.direction * sphere....? <<"\n";
-
-    Vecteur D = rayon.direction ;
-    Vecteur O = rayon.origine ;
-    Vecteur C = sphere.centre ;
-    double R = sphere.radius;
-
-    double a = D*D ;
-    double b = 2*D*(O-C);
-    double c = (O-C)*(O-C) - R*R;
-    double delta = b*b - 4*a*c;
-
-    if (delta < 0){
-        // std::cout << "a\n" ;
-        intersection.existe = false;
-        return false;
-    }
-
-    if (delta = 0){
-        intersection.existe = true;
-        double t = -b /(2*a);
-        intersection.point = O + t*C;
-        intersection.direction = rayon.direction ;
-        return true;
-    }
-
-    if (delta > 0){
-        //Il faut gérer le cas négatif, là je n'ai fait que l'intersection la plus proche au pif, oups
-        intersection.existe = true;
-        double t = -b - sqrt(delta) /(2*a);
-        intersection.point = O + t*C;
-        intersection.direction = rayon.direction ;
-    }
-
-}

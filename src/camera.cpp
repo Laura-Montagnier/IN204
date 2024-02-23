@@ -4,9 +4,11 @@ Vecteur point{0, 0, 0};
 Vecteur normale{.1, 0, 1};
 Plan plan{point, normale};
 
-Union monde{&plan}; // objet contenant toute la scène 3d
+Sphere sphere(0, 40, 1, .05);
 
-Vecteur direction_lumiere{0, .4, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
+Union monde{&sphere, &plan}; // objet contenant toute la scène 3d
+
+Vecteur direction_lumiere{1, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
 
 Vecteur couleur_ciel{0, 180, 255}; // à adapter avec un type couleur ?
 Vecteur couleur_sol{120, 100, 80};
@@ -32,7 +34,7 @@ void Camera::image() {
 
     std::cout << "camera.image()\n";
 
-    std::cout << "normale*lumiere: " << plan.normale * direction_lumiere << "\n";
+    std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
 
     for (int i = 0; i < hauteur_ecran; i += 1) {
         for (int j = 0; j < largeur_ecran; j += 1) {
@@ -41,10 +43,11 @@ void Camera::image() {
                 (j - (double)largeur_ecran / 2) * taille_pixel * ecran_x +
                 (i - (double)hauteur_ecran / 2) * taille_pixel * ecran_y;
 
-            Rayon rayon(position_camera, point_ecran - position_camera);
+            Vecteur vitesse = point_ecran - position_camera;
+            Rayon rayon(position_camera, vitesse);
 
             Intersection intersection;
-            monde.calcule_intersection(rayon, intersection);
+            monde.calcul_intersection(rayon, intersection);
 
             Vecteur couleur;
             if (intersection.existe) {
@@ -53,6 +56,7 @@ void Camera::image() {
                 couleur = couleur_sol;
                 // l'intensité varie avec cos(angle(normale,lumiere))
                 couleur *= std::max(0., intersection.normale * direction_lumiere);
+                // std::cout << intersection.normale << "\n";
             } else {
                 // couleur = get_ambiant_light ...
                 couleur = couleur_ciel;
@@ -63,3 +67,16 @@ void Camera::image() {
         }
     }
 }
+
+// void Camera::image() {
+
+//     Vecteur vitesse = centre_ecran - position_camera;
+//     vitesse *= 1/sqrt(vitesse*vitesse);
+//     Rayon rayon(position_camera, vitesse);
+
+//     std::cout << "ray " << rayon << "\n";
+//     std::cout << "sph " << sphere << "\n";
+
+//     Intersection intersection;
+//     monde.calcul_intersection(rayon, intersection);
+// }
