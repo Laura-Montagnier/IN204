@@ -46,23 +46,14 @@ Vecteur operator*(double lambda, const Vecteur vecteur) { // double * Vecteur
 
 // Opérations sur les unions
 
-void Union::ajoute(Objet &objet) {
-    std::vector<Objet *>::push_back(&objet); // utilise des pointeurs (remplacer par unique_ptr ?)
+Union::Union(std::initializer_list<Objet *> liste) {
+    ajoute(liste);
 }
 
-template <typename... Args>
-void Union::ajoute(Objet &objet, Args &...args) {
-    ajoute(objet);
-    ajoute(args...);
-}
-
-Union::Union(Objet &objet) {
-    ajoute(objet);
-}
-
-template <typename... Args>
-Union::Union(Objet &objet, Args &...args) {
-    ajoute(objet, args...);
+void Union::ajoute(std::initializer_list<Objet *> liste) {
+    for (auto &objet : liste) {
+        push_back(objet);
+    }
 }
 
 // Affichage avec stream pour les différents objets

@@ -4,7 +4,7 @@ Vecteur point{0, 0, 0};
 Vecteur normale{.1, 0, 1};
 Plan plan{point, normale};
 
-Union monde{plan}; // objet contenant toute la scène 3d
+Union monde{&plan}; // objet contenant toute la scène 3d
 
 Vecteur direction_lumiere{0, .4, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
 

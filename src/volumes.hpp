@@ -81,15 +81,8 @@ public:
 class Union : public Objet, public std::vector<Objet *> {
     // Vecteur contenant des pointeurs sur des Objets
 public:
-    void ajoute(Objet &objet);
-
-    template <typename... Args>
-    void ajoute(Objet &objet, Args &...args);
-
-    Union(Objet &objet);
-
-    template <typename... Args>
-    Union(Objet &objet, Args &...args);
+    Union(std::initializer_list<Objet *>);
+    void ajoute(std::initializer_list<Objet *>);
 
     virtual bool calcule_intersection(const Rayon &, Intersection &) const;
 };
