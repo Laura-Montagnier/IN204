@@ -142,3 +142,41 @@ public:
 
 inline std::ostream &operator<<(std::ostream &, const Materiau &);
 
+
+bool calcul_intersection(const Rayon rayon, const Sphere sphere, Intersection &intersection){
+    // std::cout << rayon << sphere <<"\n";
+    // std::cout << "produit scalaire" << rayon.direction * sphere....? <<"\n";
+
+    Vecteur D = rayon.direction ;
+    Vecteur O = rayon.origine ;
+    Vecteur C = sphere.centre ;
+    double R = sphere.radius;
+
+    double a = D*D ;
+    double b = 2*D*(O-C);
+    double c = (O-C)*(O-C) - R*R;
+    double delta = b*b - 4*a*c;
+
+    if (delta < 0){
+        // std::cout << "a\n" ;
+        intersection.existe = false;
+        return false;
+    }
+
+    if (delta = 0){
+        intersection.existe = true;
+        double t = -b /(2*a);
+        intersection.point = O + t*C;
+        intersection.direction = rayon.direction ;
+        return true;
+    }
+
+    if (delta > 0){
+        //Il faut gérer le cas négatif, là je n'ai fait que l'intersection la plus proche au pif, oups
+        intersection.existe = true;
+        double t = -b - sqrt(delta) /(2*a);
+        intersection.point = O + t*C;
+        intersection.direction = rayon.direction ;
+    }
+
+}
