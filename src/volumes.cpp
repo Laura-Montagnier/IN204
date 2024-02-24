@@ -142,12 +142,8 @@ bool Sphere::calcul_intersection(const Rayon &rayon, Intersection &intersection)
     intersection.point = O + t * D;
     intersection.direction = rayon.direction;
     intersection.distance = t; //  D normalisé ?
-    // std::cout << "dist " << intersection.distance << "\n";
-
     intersection.normale = (intersection.point - C) * (1 / R);
-    // std::cout << "pt " << intersection.point << "\n";
-
-    // std::cout << "normsq " << intersection.normale * intersection.normale << "\n";
+    intersection.materiau = materiau;
     return true;
 }
 
@@ -170,5 +166,6 @@ bool Plan::calcul_intersection(const Rayon &rayon, Intersection &intersection) c
     intersection.direction = rayon.direction;
     intersection.normale = normale; // * -sign(normale * rayon.direction);
     intersection.distance = t; //  t / norme(vitesse) ?
+    intersection.materiau = materiau;
     return true;
 }

@@ -1,10 +1,16 @@
 #include "camera.hpp"
 
+const bool affiche_normales = false;
+const bool correction_gamma = true;
+
+Materiau vert{0, 255, 0};
+Materiau vert_fonce{10, 65, 0};
+
 Vecteur point{0, 0, 0};
 Vecteur normale{.1, 0, 1};
-Plan plan{point, normale};
+Plan plan{point, normale, vert_fonce};
 
-Sphere sphere(0, 8, 1, 1);
+Sphere sphere(0, 8, 1, 1, vert);
 Sphere s2(-.4, 4, 1, .2);
 
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
@@ -13,14 +19,13 @@ Union monde{&sphere, &plan, &s2};
 Vecteur direction_lumiere{1, -1, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
 // Vecteur direction_lumiere{0, -1, 0};
 
-Vecteur couleur_sol{0, 255, 0};
-
 void colore_pixel(Vecteur couleur, int i, int j) {
     // correction gamma
-    couleur.x = sqrt(couleur.x / 255) * 255;
-    couleur.y = sqrt(couleur.y / 255) * 255;
-    couleur.z = sqrt(couleur.z / 255) * 255;
-
+    if (correction_gamma) {
+        couleur.x = sqrt(couleur.x / 255) * 255;
+        couleur.y = sqrt(couleur.y / 255) * 255;
+        couleur.z = sqrt(couleur.z / 255) * 255;
+    }
 
     SDL_SetRenderDrawColor(renderer, couleur.x, couleur.y, couleur.z, 255);
     SDL_RenderDrawPoint(renderer, j, i);
@@ -45,6 +50,7 @@ Camera::Camera() : position_camera(0, 0, 1),
                    centre_ecran(position_camera + distance_ecran * direction_camera){};
 
 void Camera::image() {
+    // crée la scène, à mettre dans une fonction
     direction_lumiere *= 1 / direction_lumiere.norme();
 
     std::cout << "camera.image()\n";
@@ -68,11 +74,13 @@ void Camera::image() {
             if (intersection.existe) {
                 // couleur = rayon.couleur ...
 
-                couleur = couleur_sol;
-                // l'intensité varie avec cos(angle(normale,lumiere))
-                couleur *= std::max(0., intersection.normale * direction_lumiere);
-
-                // couleur = (intersection.normale + Vecteur(1, 1, 1)) *  .5 * 255; // Visualise normales
+                if (affiche_normales) {
+                    couleur = (intersection.normale + Vecteur(1, 1, 1)) * .5 * 255; // Visualise normales
+                } else {
+                    couleur = intersection.materiau.couleur;
+                    // l'intensité varie avec cos(angle(normale,lumiere))
+                    couleur *= std::max(0., intersection.normale * direction_lumiere);
+                }
 
             } else {
                 // couleur = get_ambiant_light ...

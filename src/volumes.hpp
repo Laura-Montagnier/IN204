@@ -51,6 +51,24 @@ public:
 // Afficher les informations du rayon
 std::ostream &operator<<(std::ostream &, const Rayon &);
 
+class Materiau {
+private:
+public:
+    Vecteur couleur;
+
+    // Constructeurs
+
+    Materiau() : couleur(255, 0, 255){};
+    Materiau(const Vecteur point) : couleur(point) {}
+    Materiau(double r, double g, double b) : couleur(r, g, b) {}
+
+    // Remarque pour plus tard : est-ce qu'il faudrait pas renvoyer des erreurs si on est en dehors de 0 et 258 ?
+
+    Materiau(const Materiau &) = default;
+};
+
+std::ostream &operator<<(std::ostream &, const Materiau &);
+
 class Intersection {
 private:
 public:
@@ -59,6 +77,7 @@ public:
     Vecteur direction;
     Vecteur normale;
     double distance;
+    Materiau materiau;
 
     // Constructeurs
     Intersection() : existe(false){};
@@ -73,8 +92,10 @@ std::ostream &operator<<(std::ostream &, const Intersection &);
 class Objet {
 protected:
     Objet() = default;
+    Objet(Materiau materiau) : materiau(materiau){};
 
 public:
+    Materiau materiau;
     virtual bool calcul_intersection(const Rayon &, Intersection &) const = 0;
 };
 
@@ -95,8 +116,8 @@ public:
 
     // Constructeurs
     Sphere() = default;
-    Sphere(const Vecteur point, double r) : centre(point), radius(r) {}
-    Sphere(double x, double y, double z, double r) : centre(x, y, z), radius(r) {}
+    Sphere(const Vecteur point, double r, Materiau mat = Materiau()) : Objet(mat), centre(point), radius(r) {}
+    Sphere(double x, double y, double z, double r, Materiau mat = Materiau()) : Objet(mat), centre(x, y, z), radius(r) {}
     Sphere(const Sphere &) = default;
 
     virtual bool calcul_intersection(const Rayon &, Intersection &) const;
@@ -112,28 +133,10 @@ public:
     Vecteur normale;
 
     // Constructeurs
-    Plan(const Vecteur p, const Vecteur n) : point(p), normale(n) {}
+    Plan(const Vecteur p, const Vecteur n, Materiau mat = Materiau()) : Objet(mat), point(p), normale(n) {}
     Plan(const Plan &) = default;
 
     virtual bool calcul_intersection(const Rayon &, Intersection &) const;
 };
 
 std::ostream &operator<<(std::ostream &, const Plan &);
-
-class Materiau {
-private:
-public:
-    Vecteur couleur;
-
-    // Constructeurs
-
-    Materiau() = default;
-    Materiau(const Vecteur point) : couleur(point) {}
-    Materiau(double r, double g, double b) : couleur(r, g, b) {}
-
-    // Remarque pour plus tard : est-ce qu'il faudrait pas renvoyer des erreurs si on est en dehors de 0 et 258 ?
-
-    Materiau(const Materiau &) = default;
-};
-
-std::ostream &operator<<(std::ostream &, const Materiau &);
