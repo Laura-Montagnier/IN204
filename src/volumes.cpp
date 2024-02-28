@@ -134,8 +134,13 @@ bool Sphere::calcul_intersection(const Rayon &rayon, Intersection &intersection)
     } else if (delta == 0) {
         t = -b / (2 * a);
     } else { // delta < 0
-        // Il faut gérer le cas négatif, là je n'ai fait que l'intersection la plus proche au pif, oups
-        t = (-b - sqrt(delta)) / (2 * a);
+        if ((-b - sqrt(delta)) / (2 * a) > 0 ){
+            t = (-b - sqrt(delta)) / (2 * a);
+        }
+        else {
+           intersection.existe = false ;
+        }
+        
     }
 
     intersection.existe = true;
