@@ -67,7 +67,7 @@ void Union::ajoute(std::initializer_list<Objet *> liste) {
 // Affichage avec stream pour les différents objets
 
 std::ostream &operator<<(std::ostream &stream, const Vecteur &vecteur) {
-    return stream << "Vecteur(" << vecteur.x << ", " << vecteur.y << ", " << vecteur.z << ")";
+    return stream << "(" << vecteur.x << ", " << vecteur.y << ", " << vecteur.z << ")";
 }
 
 std::ostream &operator<<(std::ostream &stream, const Rayon &rayon) {
@@ -75,7 +75,7 @@ std::ostream &operator<<(std::ostream &stream, const Rayon &rayon) {
 }
 
 std::ostream &operator<<(std::ostream &stream, const Intersection &intersection) {
-    return stream << "Point d'intersection" << intersection.point << "issu du rayon" << intersection.direction;
+    return stream << "Intersection au point " << intersection.point << " issu de direction " << intersection.direction;
 }
 
 std::ostream &operator<<(std::ostream &stream, const Sphere &sphere) {
@@ -162,7 +162,7 @@ bool Plan::calcul_intersection(const Rayon &rayon, Intersection &intersection) c
     }
 
     intersection.existe = true;
-    intersection.point = rayon.origine + t * rayon.direction;
+    intersection.point = rayon.origine + (t*1.000001) * rayon.direction;
     intersection.direction = rayon.direction;
     intersection.normale = normale; // * -sign(normale * rayon.direction);
     intersection.distance = t; //  t / norme(vitesse) ?

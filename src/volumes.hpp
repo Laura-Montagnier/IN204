@@ -12,7 +12,7 @@ public:
     double z;
 
     // Constructeurs
-    Vecteur() = default;
+    Vecteur() : x(0.), y(0.), z(0.){};
     Vecteur(double x, double y, double z) : x(x), y(y), z(z){};
     Vecteur(const Vecteur &) = default;
 
@@ -58,7 +58,7 @@ public:
 
     // Constructeurs
 
-    Materiau() : couleur(255, 0, 255){};
+    Materiau() : couleur(1, 0, 1){}; // Magenta bien visible par défaut
     Materiau(const Vecteur point) : couleur(point) {}
     Materiau(double r, double g, double b) : couleur(r, g, b) {}
 
