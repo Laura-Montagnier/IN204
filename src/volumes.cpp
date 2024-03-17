@@ -172,7 +172,8 @@ bool Plan::calcul_intersection(const Rayon &rayon, Intersection &intersection) c
     }
 
     intersection.existe = true;
-    intersection.point = rayon.origine + (t*1.000001) * rayon.direction;
+    // intersection.point = rayon.origine + (t*1.000001) * rayon.direction;
+    intersection.point = rayon.origine + (t*0.9999999) * rayon.direction;
     intersection.direction = rayon.direction;
     intersection.normale = normale; // * -sign(normale * rayon.direction);
     intersection.distance = t; //  t / norme(vitesse) ?

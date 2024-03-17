@@ -1,42 +1,39 @@
 #include "rebond.hpp"
 #include <random>
 
+std::random_device rd;
+std::mt19937 generator(rd()); // Mersenne Twister 19937 engine : une méthode pour avoir de l'aléatoire
+
+std::uniform_real_distribution<double> distribution(-1, 1);
+
+Vecteur diffusion_lambert(const Vecteur &normale) {
+    bool reject = false;
+    // On va utiliser la méthode du rejet ; on cherche un vecteur dans le cube unité et on le conserve uniquement si il est dans la sphère unité.
+    Vecteur retour = {0, 0, 0};
 
 
-Vecteur diffusion_lambert(const Vecteur &point, const Vecteur &normale){
-    double I = 0.8 ;
-    double x = point.x ;
-    double y = point.y ;
-    double z = point.z ;
-    bool rejet = false ;
-    Vecteur reflechi ;
-    double cos_theta ;
 
-    std::random_device rd;
-    std::mt19937 generator(rd()); // Mersenne Twister 19937 engine
+    while (reject == false) {
+        retour.x = distribution(generator);
+        retour.y = distribution(generator);
+        retour.z = distribution(generator);
 
-    std::uniform_int_distribution<int> distribution_1(x-0.5, x+0.5);
-    std::uniform_int_distribution<int> distribution_2(y-0.5, y+0.5);
-    std::uniform_int_distribution<int> distribution_3(z-0.5, z+0.5);
-
-    while (rejet==false){
-        // Définir des distributions uniformes autour de x, y et z
-        
-        double x_1 = distribution_1(generator);
-        double y_1 = distribution_2(generator);
-        double z_1 = distribution_3(generator);
-
-        if (x*x_1 + y*y_1 + z*z_1 < 1){
-            reflechi = Vecteur(x - x_1, y - y_1, z - z_1) ;
-            cos_theta = reflechi*normale ;
-            rejet=true ;
+        if (retour.norme2() <= 1) {
+            if (retour * normale < 0) {
+                retour = retour * (-1);
+            }
+            reject = true;
         }
     }
-
-
-    return I*cos_theta*reflechi ;
+    return (retour);
 }
 
-// int main(){
-//     return 0;
-// }
+/*
+int main() {
+    Vecteur normale = {1,1,1};
+    Vecteur retour = diffusion_lambert(normale);
+    std::cout << retour << std::endl;
+    double norme = retour.norme2();
+    std::cout << norme << std::endl;
+    return 0;
+}*/

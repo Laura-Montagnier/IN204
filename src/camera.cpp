@@ -3,15 +3,11 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
-int nb_rayons = 1;
-int max_rebonds = 2;
-
-
-
+int nb_rayons = 10;
+int max_rebonds = 5;
 
 Materiau vert{0, .9, 0};
 Materiau vert_fonce{10. / 255, 65. / 255, 0};
-
 
 Vecteur point{0, 0, 0};
 Vecteur normale{.1, 0, 1};
@@ -24,7 +20,6 @@ Plan plan{point, normale, vert_fonce};
 Sphere sphere(0, 8, 1, 1, vert);
 Sphere s2(-.4, 4, 1, .2);
 
-
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
 Union monde{&sphere, &plan, &s2};
 // Union monde{&sphere, &s2};
@@ -32,6 +27,12 @@ Union monde{&sphere, &plan, &s2};
 
 Vecteur direction_lumiere{1, -1, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
 // Vecteur direction_lumiere{0, -1, 0};
+
+
+std::random_device rd_;
+std::mt19937 generator_(rd_()); // Mersenne Twister 19937 engine
+std::uniform_real_distribution<double> rand_double(0, 1);
+
 
 void colore_pixel(Vecteur couleur, int i, int j) {
     // correction gamma
@@ -64,11 +65,15 @@ Vecteur lance_rayon(Rayon &rayon) {
             couleur.z *= intersection.materiau.couleur.z;
             rayon.origine = intersection.point;
 
+            if (rand_double(generator_) <= intersection.materiau.p_reflexion) {
+                // reflexion
+                rayon.direction = rayon.direction + 2 * (rayon.direction * intersection.normale) * intersection.normale;
+            } else {
+                // diffusion
+                rayon.direction = diffusion_lambert(intersection.normale);
+            }
             couleur *= std::max(0., intersection.normale * direction_lumiere);
 
-            // rayon.direction = diffusion_lambert(intersection.point, intersection.normale); // diffusion
-
-            rayon.direction = rayon.direction + 2 * (rayon.direction * intersection.normale) * intersection.normale; // reflexion
         } else {
             break;
         }
@@ -93,14 +98,13 @@ void Camera::image() {
     direction_lumiere *= 1 / direction_lumiere.norme();
     // plan.normale *= 1 / plan.normale.norme();
 
-
     std::cout << "camera.image()\n";
 
     std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
 
     for (int i = 0; i < hauteur_ecran; i += 1) {
+            std::cout << i << "\n";
         for (int j = 0; j < largeur_ecran; j += 1) {
-            // std::cout << j << "\n";
             Vecteur point_ecran =
                 centre_ecran +
                 (j - (double)largeur_ecran / 2) * taille_pixel * ecran_x +
