@@ -3,7 +3,7 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
-int nb_rayons = 10;
+int nb_rayons = 40;
 int max_rebonds = 5;
 
 Materiau vert{0, .9, 0};
@@ -102,6 +102,7 @@ void Camera::image() {
 
     std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
 
+#pragma omp parallel for 
     for (int i = 0; i < hauteur_ecran; i += 1) {
             std::cout << i << "\n";
         for (int j = 0; j < largeur_ecran; j += 1) {
@@ -142,7 +143,7 @@ void Camera::image() {
             //     couleur = couleur_ciel(i, hauteur_ecran);
             // }
             // Vecteur couleur = intersection.existe * couleur_sol + !intersection.existe * couleur_ciel;
-
+#pragma omp critical
             colore_pixel(couleur, i, j);
         }
     }
