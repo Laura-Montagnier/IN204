@@ -3,8 +3,8 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
-int nb_rayons = 20;
-int max_rebonds = 8;
+int nb_rayons = 200;
+int max_rebonds = 13;
 
 Materiau vert{0, .9, 0};
 Materiau vert_fonce{10. / 255, 65. / 255, 0};
@@ -45,10 +45,9 @@ Union monde{&sphere, &plan, &plan_2, &plan_4, &s2, &soleil};
 // Union monde{&sphere, &s2};
 // Union monde{&plan};
 
-//Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
-// Vecteur direction_lumiere{0, -1, 0};
+// Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
+//  Vecteur direction_lumiere{0, -1, 0};
 Vecteur direction_lumiere{0, 0, 1}; // vecteur vers le plafond
-
 
 std::random_device rd_;
 std::mt19937 generator_(rd_()); // Mersenne Twister 19937 engine
@@ -66,12 +65,11 @@ inline void colore_pixel(Vecteur couleur, int i, int j) {
     SDL_RenderDrawPoint(renderer, j, i);
 }
 
-void colore_ligne(Vecteur couleurs[], int i, int largeur_ecran){
-    for (int j = 0 ; j < largeur_ecran; j++){
+void colore_ligne(Vecteur couleurs[], int i, int largeur_ecran) {
+    for (int j = 0; j < largeur_ecran; j++) {
         colore_pixel(couleurs[j], i, j);
     }
 }
-
 
 Vecteur couleur_ciel(int i, int max_i) {
     // double k = (rayon.direction.y / rayon.direction.norme() + 1) / 2;
@@ -132,10 +130,10 @@ Vecteur lance_rayon(Rayon &rayon) {
             rayon.direction = direction_refractee(rayon.direction, intersection.normale);
             // Vecteur d = direction_refractee(rayon.direction, intersection.normale);
             // if (rayon.direction * d > 0) {
-                // le rayon a bien été réfracté
-                // On sassure que le pt d'origine est bien de l'autre coté de la surface
-                // rayon.origine += intersection.distance * .0001 * rayon.direction;
-                // rayon.direction = d;
+            // le rayon a bien été réfracté
+            // On sassure que le pt d'origine est bien de l'autre coté de la surface
+            // rayon.origine += intersection.distance * .0001 * rayon.direction;
+            // rayon.direction = d;
             // }
         } else {
             // diffusion
@@ -167,12 +165,12 @@ void Camera::image() {
 
     // std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
 
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic, 10)
     for (int i = 0; i < hauteur_ecran; i += 1) {
         int id = omp_get_thread_num();
         int num_threads = omp_get_num_threads();
-        if (id==0){
-            std::cout << "> " << (int)(100.*i*num_threads / hauteur_ecran) << "%   \r";
+        if (id == 0) {
+            std::cout << "> " << (int)(100. * i / hauteur_ecran) << "%   \r";
             std::flush(std::cout);
         }
         Vecteur couleurs_ligne[largeur_ecran];
@@ -216,10 +214,14 @@ void Camera::image() {
             // Vecteur couleur = intersection.existe * couleur_sol + !intersection.existe * couleur_ciel;
 
             couleurs_ligne[j] = couleur;
-
         }
 #pragma omp critical
-            colore_ligne(couleurs_ligne, i, largeur_ecran);
+        colore_ligne(couleurs_ligne, i, largeur_ecran);
+        
+        if (id == 0) {
+            // même pas de différence de perf, et effet très classe
+            updateRender();
+        }
     }
 
     std ::cout << "fini \n";
