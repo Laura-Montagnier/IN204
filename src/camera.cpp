@@ -19,11 +19,13 @@ Vecteur point{0, 0, 0};
 Vecteur point_2{-2.5, 0, 0};
 Vecteur point_3{2.5, 0, 0};
 Vecteur point_4{0, 25, 0};
+Vecteur point_5{0, 0, 25};
 
 Vecteur normale{0, 0, 1};
 Vecteur normale_2{1, 0, 0};
 Vecteur normale_3{-1, 0, 0};
 Vecteur normale_4{0, -1, 0};
+Vecteur normale_5{0, 0, 1};
 
 // Vecteur point{0, 5, 0};
 // Vecteur normale{0, -1, .1};
@@ -32,6 +34,7 @@ Plan plan{point, normale, rouge_fonce};
 Plan plan_2{point_2, normale_2, bleu_fonce};
 Plan plan_3{point_3, normale_3, vert_fonce};
 Plan plan_4{point_4, normale_4, vert_fonce};
+Plan plafond{point_5, normale_5, materiau_soleil};
 
 Sphere sphere(0, 8, 1, 1, verre);
 Sphere s2(-.4, 4, 1, .2);
@@ -42,8 +45,10 @@ Union monde{&sphere, &plan, &plan_2, &plan_4, &s2, &soleil};
 // Union monde{&sphere, &s2};
 // Union monde{&plan};
 
-Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
+//Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
 // Vecteur direction_lumiere{0, -1, 0};
+Vecteur direction_lumiere{0, 0, 1}; // vecteur vers le plafond
+
 
 std::random_device rd_;
 std::mt19937 generator_(rd_()); // Mersenne Twister 19937 engine
