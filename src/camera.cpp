@@ -4,7 +4,7 @@ const bool affiche_normales = false;
 const bool correction_gamma = true;
 
 int nb_rayons = 20;
-int max_rebonds = 13;
+int max_rebonds = 8;
 
 Materiau vert{0, .9, 0};
 Materiau vert_fonce{10. / 255, 65. / 255, 0};
@@ -129,13 +129,14 @@ Vecteur lance_rayon(Rayon &rayon) {
             rayon.direction = direction_reflechie(rayon.direction, intersection.normale);
         } else if (r <= mat.p_reflexion + mat.p_transmission) {
             // transmission ou réflexion totale
-            Vecteur d = direction_refractee(rayon.direction, intersection.normale);
-            if (rayon.direction * d > 0) {
+            rayon.direction = direction_refractee(rayon.direction, intersection.normale);
+            // Vecteur d = direction_refractee(rayon.direction, intersection.normale);
+            // if (rayon.direction * d > 0) {
                 // le rayon a bien été réfracté
-                // On stassure que le pt d'origine est bien de l'autre coté de la surface
-                rayon.origine += intersection.distance * .0001 * rayon.direction;
-                rayon.direction = d;
-            }
+                // On sassure que le pt d'origine est bien de l'autre coté de la surface
+                // rayon.origine += intersection.distance * .0001 * rayon.direction;
+                // rayon.direction = d;
+            // }
         } else {
             // diffusion
             rayon.direction = direction_difusee(intersection.normale);
@@ -168,7 +169,12 @@ void Camera::image() {
 
 #pragma omp parallel for
     for (int i = 0; i < hauteur_ecran; i += 1) {
-        std::cout << i << "\n";
+        int id = omp_get_thread_num();
+        int num_threads = omp_get_num_threads();
+        if (id==0){
+            std::cout << "> " << (int)(100.*i*num_threads / hauteur_ecran) << "%   \r";
+            std::flush(std::cout);
+        }
         Vecteur couleurs_ligne[largeur_ecran];
         for (int j = 0; j < largeur_ecran; j += 1) {
             Vecteur point_ecran =
