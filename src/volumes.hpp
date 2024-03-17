@@ -56,12 +56,13 @@ private:
 public:
     Vecteur couleur;
     double p_reflexion;
+    bool lumineux;
 
     // Constructeurs
 
-    Materiau() : couleur(1, 0, 1), p_reflexion(0.){}; // Magenta bien visible par défaut
-    Materiau(const Vecteur point, double p_reflexion = 0.) : couleur(point), p_reflexion(p_reflexion) {}
-    Materiau(double r, double g, double b, double p_reflexion = 0.) : couleur(r, g, b), p_reflexion(p_reflexion) {}
+    Materiau(); // Magenta bien visible par défaut
+    Materiau(const Vecteur couleur, double p_reflexion = 0., bool lumineux = false);
+    Materiau(double r, double g, double b, double p_reflexion = 0., bool lumineux = false);
 
     // Remarque pour plus tard : est-ce qu'il faudrait pas renvoyer des erreurs si on est en dehors de 0 et 258 ?
 
