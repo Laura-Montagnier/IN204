@@ -181,10 +181,12 @@ bool Plan::calcul_intersection(const Rayon &rayon, Intersection &intersection) c
 }
 
 // Constructeurs Materiau
-Materiau::Materiau() : couleur(1, 0, 1), p_reflexion(0.), lumineux(false){}; // Magenta bien visible par défaut
-Materiau::Materiau(const Vecteur couleur, double p_reflexion, bool lumineux) : couleur(couleur),
-                                                                               p_reflexion(p_reflexion),
-                                                                               lumineux(lumineux){};
-Materiau::Materiau(double r, double g, double b, double p_reflexion, bool lumineux) : couleur(r, g, b),
-                                                                                      p_reflexion(p_reflexion),
-                                                                                      lumineux(lumineux){};
+Materiau::Materiau() : couleur(1, 0, 1), p_reflexion(0.), p_transmission(0.), lumineux(false){}; // Magenta bien visible par défaut
+Materiau::Materiau(const Vecteur couleur, double p_reflexion, double p_transmission, bool lumineux) : couleur(couleur),
+                                                                                                      p_reflexion(p_reflexion),
+                                                                                                      p_transmission(p_transmission),
+                                                                                                      lumineux(lumineux){};
+Materiau::Materiau(double r, double g, double b, double p_reflexion, double p_transmission, bool lumineux) : couleur(r, g, b),
+                                                                                                             p_reflexion(p_reflexion),
+                                                                                                             p_transmission(p_transmission),
+                                                                                                             lumineux(lumineux){};

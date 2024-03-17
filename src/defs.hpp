@@ -8,6 +8,7 @@
 #include <vector>
 #include <random>
 #include <omp.h>
+#include <algorithm>
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 400
