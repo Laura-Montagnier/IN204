@@ -12,7 +12,7 @@ public:
     double z;
 
     // Constructeurs
-    Vecteur() = default;
+    Vecteur() : x(0.), y(0.), z(0.){};
     Vecteur(double x, double y, double z) : x(x), y(y), z(z){};
     Vecteur(const Vecteur &) = default;
 
@@ -55,12 +55,13 @@ class Materiau {
 private:
 public:
     Vecteur couleur;
+    double p_reflexion;
 
     // Constructeurs
 
-    Materiau() : couleur(255, 0, 255){};
-    Materiau(const Vecteur point) : couleur(point) {}
-    Materiau(double r, double g, double b) : couleur(r, g, b) {}
+    Materiau() : couleur(1, 0, 1), p_reflexion(0.){}; // Magenta bien visible par défaut
+    Materiau(const Vecteur point, double p_reflexion = 0.) : couleur(point), p_reflexion(p_reflexion) {}
+    Materiau(double r, double g, double b, double p_reflexion = 0.) : couleur(r, g, b), p_reflexion(p_reflexion) {}
 
     // Remarque pour plus tard : est-ce qu'il faudrait pas renvoyer des erreurs si on est en dehors de 0 et 258 ?
 
