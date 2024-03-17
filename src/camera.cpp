@@ -6,29 +6,44 @@ const bool correction_gamma = true;
 int nb_rayons = 50;
 int max_rebonds = 5;
 
-Materiau vert{0, .9, 0,};
+Materiau vert{
+    0,
+    .9,
+    0,
+};
 Materiau vert_fonce{10. / 255, 65. / 255, 0};
 Materiau materiau_soleil{1, 1, .5, 0, true};
+Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255};
+Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255};
 
 Vecteur point{0, 0, 0};
-Vecteur normale{.1, 0, 1};
+Vecteur point_2{-2.5, 0, 0};
+Vecteur point_3{2.5, 0, 0};
+Vecteur point_4{0, 25, 0};
+
+Vecteur normale{0, 0, 1};
+Vecteur normale_2{1, 0, 0};
+Vecteur normale_3{-1, 0, 0};
+Vecteur normale_4{0, -1, 0};
 
 // Vecteur point{0, 5, 0};
 // Vecteur normale{0, -1, .1};
 
-Plan plan{point, normale, vert_fonce};
+Plan plan{point, normale, rouge_fonce};
+Plan plan_2{point_2, normale_2, bleu_fonce};
+Plan plan_3{point_3, normale_3, vert_fonce};
+Plan plan_4{point_4, normale_4, vert_fonce};
 
 Sphere sphere(0, 8, 1, 1, vert);
 Sphere s2(-.4, 4, 1, .2);
 Sphere soleil(8, 20, 12, 10, materiau_soleil);
 
-
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
-Union monde{&sphere, &plan, &s2, &soleil};
+Union monde{&sphere, &plan, &plan_2, &plan_4, &s2};
 // Union monde{&sphere, &s2};
 // Union monde{&plan};
 
-Vecteur direction_lumiere{1, -1, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
+Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
 // Vecteur direction_lumiere{0, -1, 0};
 
 std::random_device rd_;
@@ -74,9 +89,7 @@ Vecteur lance_rayon(Rayon &rayon) {
             break;
         }
 
-
-
-        if (intersection.materiau.lumineux){
+        if (intersection.materiau.lumineux) {
 
             couleur.x *= intersection.materiau.couleur.x;
             couleur.y *= intersection.materiau.couleur.y;
@@ -84,9 +97,8 @@ Vecteur lance_rayon(Rayon &rayon) {
 
             // couleur *= 10.;
 
-        break;
+            break;
         }
-
 
         // std::cout << intersection << "\n";
         couleur.x *= intersection.materiau.couleur.x;
@@ -101,9 +113,6 @@ Vecteur lance_rayon(Rayon &rayon) {
             rayon.direction = diffusion_lambert(intersection.normale);
             // couleur *= std::max(0., intersection.normale * direction_lumiere);
         }
-
-
-
     }
 
     return couleur;
@@ -127,7 +136,7 @@ void Camera::image() {
 
     std::cout << "camera.image()\n";
 
-    std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
+    // std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
 
 #pragma omp parallel for
     for (int i = 0; i < hauteur_ecran; i += 1) {
