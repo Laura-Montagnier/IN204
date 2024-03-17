@@ -3,6 +3,7 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
+
 Materiau vert{0, 255, 0};
 Materiau vert_fonce{10, 65, 0};
 
@@ -18,6 +19,9 @@ Union monde{&sphere, &plan, &s2};
 
 Vecteur direction_lumiere{1, -1, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
 // Vecteur direction_lumiere{0, -1, 0};
+
+
+
 
 void colore_pixel(Vecteur couleur, int i, int j) {
     // correction gamma
@@ -55,9 +59,10 @@ void Camera::image() {
 
     std::cout << "camera.image()\n";
 
-    std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
+    //std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
 
     for (int i = 0; i < hauteur_ecran; i += 1) {
+        std::cout << i << "\n" ;
         for (int j = 0; j < largeur_ecran; j += 1) {
             Vecteur point_ecran =
                 centre_ecran +
@@ -91,6 +96,7 @@ void Camera::image() {
             colore_pixel(couleur, i, j);
         }
     }
+    std::cout << "coucou \n";
 }
 
 // void Camera::image() {
