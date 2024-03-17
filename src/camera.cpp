@@ -33,7 +33,7 @@ Sphere sphere(0, 8, 1, 1, vert);
 Sphere s2(-.4, 4, 1, .2);
 
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
-Union monde{&sphere, &plan, &plan_2, &plan_4, &s2};
+Union monde{&sphere, &plan, &s2};
 // Union monde{&sphere, &s2};
 // Union monde{&plan};
 
