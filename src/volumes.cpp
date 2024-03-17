@@ -134,19 +134,16 @@ bool Sphere::calcul_intersection(const Rayon &rayon, Intersection &intersection)
     } else if (delta == 0) {
         t = -b / (2 * a);
     } else { // delta < 0
-        if ((-b - sqrt(delta)) / (2 * a) > 0 ){
+        if ((-b - sqrt(delta)) / (2 * a) > 0) {
             t = (-b - sqrt(delta)) / (2 * a);
+        } else {
+            intersection.existe = false;
+            return false;
         }
-        else {
-           intersection.existe = false ;
-           return false;
-        }
-        
     }
 
     // t*=1.0001;
-    t*=0.9999;
-
+    t *= 0.9999;
 
     intersection.existe = true;
     intersection.point = O + t * D;
@@ -173,10 +170,19 @@ bool Plan::calcul_intersection(const Rayon &rayon, Intersection &intersection) c
 
     intersection.existe = true;
     // intersection.point = rayon.origine + (t*1.000001) * rayon.direction;
-    intersection.point = rayon.origine + (t*0.9999999) * rayon.direction;
+    intersection.point = rayon.origine + (t * 0.9999999) * rayon.direction;
     intersection.direction = rayon.direction;
     intersection.normale = normale; // * -sign(normale * rayon.direction);
-    intersection.distance = t; //  t / norme(vitesse) ?
+    intersection.distance = t;      //  t / norme(vitesse) ?
     intersection.materiau = materiau;
     return true;
 }
+
+// Constructeurs Materiau
+Materiau::Materiau() : couleur(1, 0, 1), p_reflexion(0.), lumineux(false){}; // Magenta bien visible par défaut
+Materiau::Materiau(const Vecteur couleur, double p_reflexion, bool lumineux) : couleur(couleur),
+                                                                               p_reflexion(p_reflexion),
+                                                                               lumineux(lumineux){};
+Materiau::Materiau(double r, double g, double b, double p_reflexion, bool lumineux) : couleur(r, g, b),
+                                                                                      p_reflexion(p_reflexion),
+                                                                                      lumineux(lumineux){};

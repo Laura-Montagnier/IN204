@@ -3,11 +3,12 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
-int nb_rayons = 40;
+int nb_rayons = 50;
 int max_rebonds = 5;
 
-Materiau vert{0, .9, 0};
+Materiau vert{0, .9, 0,};
 Materiau vert_fonce{10. / 255, 65. / 255, 0};
+Materiau materiau_soleil{1, 1, .5, 0, true};
 
 Vecteur point{0, 0, 0};
 Vecteur normale{.1, 0, 1};
@@ -19,20 +20,20 @@ Plan plan{point, normale, vert_fonce};
 
 Sphere sphere(0, 8, 1, 1, vert);
 Sphere s2(-.4, 4, 1, .2);
+Sphere soleil(8, 20, 12, 10, materiau_soleil);
+
 
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
-Union monde{&sphere, &plan, &s2};
+Union monde{&sphere, &plan, &s2, &soleil};
 // Union monde{&sphere, &s2};
 // Union monde{&plan};
 
 Vecteur direction_lumiere{1, -1, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
 // Vecteur direction_lumiere{0, -1, 0};
 
-
 std::random_device rd_;
 std::mt19937 generator_(rd_()); // Mersenne Twister 19937 engine
 std::uniform_real_distribution<double> rand_double(0, 1);
-
 
 void colore_pixel(Vecteur couleur, int i, int j) {
     // correction gamma
@@ -49,6 +50,7 @@ void colore_pixel(Vecteur couleur, int i, int j) {
 Vecteur couleur_ciel(int i, int max_i) {
     // double k = (rayon.direction.y / rayon.direction.norme() + 1) / 2;
     double k = (double)i / max_i;
+    k = std::max(k, 1.);
     return Vecteur(200. / 255, 220. / 255, 255. / 255) * k + Vecteur(0. / 255, 100. / 255, 255. / 255) * (1 - k);
     // return Vecteur(0./255, 0./255, 0./255) * k + Vecteur(0./255, 60./255, 80./255) * (1 - k);
 }
@@ -58,25 +60,50 @@ Vecteur lance_rayon(Rayon &rayon) {
     for (int i = 0; i < max_rebonds; i++) {
         Intersection intersection;
         monde.calcul_intersection(rayon, intersection);
-        if (intersection.existe) {
-            // std::cout << intersection << "\n";
+        if (!intersection.existe) {
+            // Vecteur ciel = couleur_ciel(std::min(std::max(rayon.direction.z, 500.), 0.), 500);
+            // couleur.x *= ciel.x;
+            // couleur.y *= ciel.y;
+            // couleur.z *= ciel.z;
+
+            // couleur.x *= .5;
+            // couleur.y *= .7;
+            // couleur.z *= .9;
+
+            couleur = Vecteur(0, 0, 0);
+            break;
+        }
+
+
+
+        if (intersection.materiau.lumineux){
+
             couleur.x *= intersection.materiau.couleur.x;
             couleur.y *= intersection.materiau.couleur.y;
             couleur.z *= intersection.materiau.couleur.z;
-            rayon.origine = intersection.point;
 
-            if (rand_double(generator_) <= intersection.materiau.p_reflexion) {
-                // reflexion
-                rayon.direction = rayon.direction + 2 * (rayon.direction * intersection.normale) * intersection.normale;
-            } else {
-                // diffusion
-                rayon.direction = diffusion_lambert(intersection.normale);
-            }
-            couleur *= std::max(0., intersection.normale * direction_lumiere);
+            // couleur *= 10.;
 
-        } else {
-            break;
+        break;
         }
+
+
+        // std::cout << intersection << "\n";
+        couleur.x *= intersection.materiau.couleur.x;
+        couleur.y *= intersection.materiau.couleur.y;
+        couleur.z *= intersection.materiau.couleur.z;
+        rayon.origine = intersection.point;
+        if (rand_double(generator_) <= intersection.materiau.p_reflexion) {
+            // reflexion
+            rayon.direction = rayon.direction + 2 * (rayon.direction * intersection.normale) * intersection.normale;
+        } else {
+            // diffusion
+            rayon.direction = diffusion_lambert(intersection.normale);
+            // couleur *= std::max(0., intersection.normale * direction_lumiere);
+        }
+
+
+
     }
 
     return couleur;
@@ -102,9 +129,9 @@ void Camera::image() {
 
     std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
 
-#pragma omp parallel for 
+#pragma omp parallel for
     for (int i = 0; i < hauteur_ecran; i += 1) {
-            std::cout << i << "\n";
+        std::cout << i << "\n";
         for (int j = 0; j < largeur_ecran; j += 1) {
             Vecteur point_ecran =
                 centre_ecran +
