@@ -4,7 +4,8 @@ const bool affiche_normales = false;
 const bool correction_gamma = true;
 
 int nb_rayons = 1;
-int max_rebonds = 5;
+int max_rebonds = 2;
+
 
 
 
@@ -23,8 +24,10 @@ Plan plan{point, normale, vert_fonce};
 Sphere sphere(0, 8, 1, 1, vert);
 Sphere s2(-.4, 4, 1, .2);
 
+
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
 Union monde{&sphere, &plan, &s2};
+// Union monde{&sphere, &s2};
 // Union monde{&plan};
 
 Vecteur direction_lumiere{1, -1, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
@@ -63,7 +66,8 @@ Vecteur lance_rayon(Rayon &rayon) {
 
             couleur *= std::max(0., intersection.normale * direction_lumiere);
 
-            // rayon.direction = calcule_direction_rebond_aleatoire(intersection); // diffusion
+            // rayon.direction = diffusion_lambert(intersection.point, intersection.normale); // diffusion
+
             rayon.direction = rayon.direction + 2 * (rayon.direction * intersection.normale) * intersection.normale; // reflexion
         } else {
             break;
@@ -96,6 +100,7 @@ void Camera::image() {
 
     for (int i = 0; i < hauteur_ecran; i += 1) {
         for (int j = 0; j < largeur_ecran; j += 1) {
+            // std::cout << j << "\n";
             Vecteur point_ecran =
                 centre_ecran +
                 (j - (double)largeur_ecran / 2) * taille_pixel * ecran_x +
@@ -108,20 +113,13 @@ void Camera::image() {
             monde.calcul_intersection(rayon, intersection);
 
             Vecteur couleur;
-            // std::cout << couleur << "\n";
 
             for (int k = 0; k < nb_rayons; k++) {
                 Rayon rayon(position_camera, vitesse);
-                // rayon.origine += k*1e-4* Vecteur(1, 0, 0);
-
+                // rayon.origine += k*1e-4* Vecteur(1, 0, 0); // TODO: remplacer par variation aléatoire
                 couleur += lance_rayon(rayon);
-                // std::cout << couleur << "\n";
             }
-            // couleur = lance_rayon(rayon);
-            // couleur = lance_rayon(rayon);
-            // std::cout << couleur << "\n";
             couleur *= 1. / nb_rayons;
-            // std::cout << couleur << "\n";
 
             // return
             // if (intersection.existe) {

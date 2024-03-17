@@ -139,9 +139,14 @@ bool Sphere::calcul_intersection(const Rayon &rayon, Intersection &intersection)
         }
         else {
            intersection.existe = false ;
+           return false;
         }
         
     }
+
+    // t*=1.0001;
+    t*=0.9999;
+
 
     intersection.existe = true;
     intersection.point = O + t * D;

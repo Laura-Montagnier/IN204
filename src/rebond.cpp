@@ -37,6 +37,6 @@ Vecteur diffusion_lambert(const Vecteur &point, const Vecteur &normale){
     return I*cos_theta*reflechi ;
 }
 
-int main(){
-    return 0;
-}
+// int main(){
+//     return 0;
+// }

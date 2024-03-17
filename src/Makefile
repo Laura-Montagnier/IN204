@@ -2,7 +2,7 @@ CFLAGS = -g `sdl2-config --cflags` -Wall
 LDFLAGS = `sdl2-config --libs`  -lSDL2_ttf -lSDL2_mixer
 PROG = ray_tracer
 CXX = g++
-OBJS = init.o graphics.o main.o camera.o volumes.o
+OBJS = init.o graphics.o main.o camera.o volumes.o rebond.o
 
 # top-level rule to create the program.
 all: $(PROG)
