@@ -29,6 +29,13 @@ int main(int argc, const char *argv[]) {
 
     updateRender();
 
+    // Capture the current screen into a surface
+    SDL_Surface *screenshot = SDL_CreateRGBSurface(0, WINDOW_WIDTH, WINDOW_HEIGHT, 32, 0, 0, 0, 0);
+    SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, screenshot->pixels, screenshot->pitch);
+
+    IMG_SavePNG(screenshot, "out.png");
+    SDL_FreeSurface(screenshot);
+
     // Cette boucle sert à fermer la fenêtre en cliquant sur la petite croix.
     while (SDL_PollEvent(&event)) { // Empties event poll
     }
