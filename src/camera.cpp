@@ -3,8 +3,8 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
-int nb_rayons = 50;
-int max_rebonds = 5;
+int nb_rayons = 40;
+int max_rebonds = 8;
 
 Materiau vert{
     0,
@@ -15,6 +15,8 @@ Materiau vert_fonce{10. / 255, 65. / 255, 0, 0.5, false};
 Materiau materiau_soleil{1, 1, .5, 0, true};
 Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255, 0.5, false};
 Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255, 0.5, false};
+
+Materiau miroir{1, 1, 1, 1};
 
 Vecteur point{0, 0, 0};
 Vecteur point_2{-2.5, 0, 0};
@@ -38,11 +40,11 @@ Plan plan_4{point_4, normale_4, vert_fonce};
 Plan plafond{point_5, normale_5, materiau_soleil};
 
 Sphere sphere(0, 8, 1, 1, vert);
-Sphere s2(-.4, 4, 1, .2);
-//Sphere soleil(8, 20, 12, 10, materiau_soleil);
+Sphere s2(-.4, 4, 1, .2, miroir);
+Sphere soleil(8, 20, 12, 10, materiau_soleil);
 
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
-Union monde{&sphere, &plan, &s2};
+Union monde{&sphere, &plan, &plan_2, &plan_4, &s2, &soleil};
 // Union monde{&sphere, &s2};
 // Union monde{&plan};
 
@@ -112,7 +114,7 @@ Vecteur lance_rayon(Rayon &rayon) {
         rayon.origine = intersection.point;
         if (rand_double(generator_) <= intersection.materiau.p_reflexion) {
             // reflexion
-            rayon.direction = rayon.direction + 2 * (rayon.direction * intersection.normale) * intersection.normale;
+            rayon.direction = rayon.direction - 2 * (rayon.direction * intersection.normale) * intersection.normale;
         } else {
             // diffusion
             rayon.direction = diffusion_lambert(intersection.normale);
