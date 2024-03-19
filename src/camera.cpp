@@ -3,15 +3,15 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
-int nb_rayons = 200;
-int max_rebonds = 13;
+int nb_rayons = 20;
+int max_rebonds = 10;
 
 Materiau vert{0, .9, 0};
 Materiau vert_fonce{10. / 255, 65. / 255, 0};
 Materiau materiau_soleil{1, 1, .5, 0, 0, true};
 Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255};
 Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255};
-Materiau verre{1, 1, 1, .2, .8};
+Materiau verre{1, 1, 1, .1, .9};
 
 Materiau miroir{1, 1, 1, 1};
 
@@ -119,26 +119,33 @@ Vecteur lance_rayon(Rayon &rayon) {
         couleur.x *= mat.couleur.x;
         couleur.y *= mat.couleur.y;
         couleur.z *= mat.couleur.z;
-        rayon.origine = intersection.point;
 
         double r = rand_double(generator_);
         if (r <= mat.p_reflexion) {
             // reflexion
             rayon.direction = direction_reflechie(rayon.direction, intersection.normale);
+            rayon.origine = intersection.point;
         } else if (r <= mat.p_reflexion + mat.p_transmission) {
             // transmission ou réflexion totale
             rayon.direction = direction_refractee(rayon.direction, intersection.normale);
-            // Vecteur d = direction_refractee(rayon.direction, intersection.normale);
-            // if (rayon.direction * d > 0) {
-            // le rayon a bien été réfracté
-            // On sassure que le pt d'origine est bien de l'autre coté de la surface
-            // rayon.origine += intersection.distance * .0001 * rayon.direction;
-            // rayon.direction = d;
-            // }
+            //     Vecteur d = direction_refractee(rayon.direction, intersection.normale);
+            //     if (rayon.direction * d > 0) {
+            //     // le rayon a bien été réfracté
+            //     // On sassure que le pt d'origine est bien de l'autre coté de la surface
+
+            //     // rayon.origine += intersection.distance * 3*epsilon * rayon.direction;
+            // rayon.origine += intersection.distance * (2*epsilon) * rayon.direction ;
+            //     rayon.direction = d;
+            //     }
+
+            // rayon.origine = intersection.point + (intersection.distance * (20 * epsilon) * rayon.direction);
+            rayon.origine = intersection.point + (intersection.distance * (5 * epsilon) * rayon.direction);
+
         } else {
             // diffusion
             rayon.direction = direction_difusee(intersection.normale);
             // couleur *= std::max(0., intersection.normale * rayon.direction);
+            rayon.origine = intersection.point;
         }
     }
 
@@ -190,7 +197,9 @@ void Camera::image() {
 
             for (int k = 0; k < nb_rayons; k++) {
                 Rayon rayon(position_camera, vitesse);
-                // rayon.origine += k*1e-4* Vecteur(1, 0, 0); // TODO: remplacer par variation aléatoire
+                double dx = (rand_double(generator_) - .5) * taille_pixel;
+                double dy = (rand_double(generator_) - .5) * taille_pixel;
+                rayon.origine += dx * ecran_x + dy * ecran_y;
                 couleur += lance_rayon(rayon);
             }
             couleur *= 1. / nb_rayons;
@@ -217,7 +226,7 @@ void Camera::image() {
         }
 #pragma omp critical
         colore_ligne(couleurs_ligne, i, largeur_ecran);
-        
+
         if (id == 0) {
             // même pas de différence de perf, et effet très classe
             updateRender();
