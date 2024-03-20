@@ -3,7 +3,7 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
-int nb_rayons = 40;
+int nb_rayons = 500;
 int max_rebonds = 8;
 
 Materiau vert{
@@ -11,18 +11,21 @@ Materiau vert{
     .9,
     0,
 };
-Materiau vert_fonce{10. / 255, 65. / 255, 0, 0.5, false};
+Materiau blanche{1,1,1};
+Materiau vert_fonce{10. / 255, 65. / 255, 0.1, 0, false};
 Materiau materiau_soleil{1, 1, .5, 0, true};
-Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255, 0.5, false};
-Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255, 0.5, false};
+Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255, 0, false};
+Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255, 0, false};
 
-Materiau miroir{1, 1, 1, 1};
+Materiau miroir{1, 1, 1, 0.9};
+
+Materiau mat{1, 1, 1, 0};
 
 Vecteur point{0, 0, 0};
-Vecteur point_2{-2.5, 0, 0};
-Vecteur point_3{2.5, 0, 0};
-Vecteur point_4{0, 25, 0};
-Vecteur point_5{0, 0, 25};
+Vecteur point_2{-3.5, 0, 0};
+Vecteur point_3{3.5, 0, 0};
+Vecteur point_4{0, 15, 0};
+Vecteur point_5{0, 0, 3.5};
 
 Vecteur normale{0, 0, 1};
 Vecteur normale_2{1, 0, 0};
@@ -34,17 +37,18 @@ Vecteur normale_5{0, 0, 1};
 // Vecteur normale{0, -1, .1};
 
 Plan plan{point, normale, rouge_fonce};
-Plan plan_2{point_2, normale_2, bleu_fonce};
+Plan plan_2{point_2, normale_2, vert_fonce};
 Plan plan_3{point_3, normale_3, vert_fonce};
-Plan plan_4{point_4, normale_4, vert_fonce};
+Plan plan_4{point_4, normale_4, bleu_fonce};
 Plan plafond{point_5, normale_5, materiau_soleil};
 
-Sphere sphere(0, 8, 1, 1, vert);
-Sphere s2(-.4, 4, 1, .2, miroir);
+Sphere sphere(0, 8, 1, 1, miroir);
+Sphere s2(-.4, 6, 0.2, .2, vert_fonce);
+Sphere s3(0.5, 5, 0.4, 0.4, bleu_fonce);
 Sphere soleil(8, 20, 12, 10, materiau_soleil);
 
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
-Union monde{&sphere, &plan, &plan_2, &plan_4, &s2, &soleil};
+Union monde{&sphere, &plan, &plan_2, &plan_3, &plan_4, &s2, &s3, &plafond};
 // Union monde{&sphere, &s2};
 // Union monde{&plan};
 
