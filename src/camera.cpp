@@ -3,31 +3,18 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
-<<<<<<< HEAD
-int nb_rayons = 500;
-int max_rebonds = 8;
-
-Materiau vert{
-    0,
-    .9,
-    0,
-};
-Materiau blanche{1,1,1};
-Materiau vert_fonce{10. / 255, 65. / 255, 0.1, 0, false};
-Materiau materiau_soleil{1, 1, .5, 0, true};
-Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255, 0, false};
-Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255, 0, false};
-=======
+//On lance 20 rayons par pixels, qui disparaissent au bout de 10 rebonds sur les objets environnants.
 int nb_rayons = 20;
 int max_rebonds = 10;
 
+//Nos matériaux sont définis avec 6 champs : les trois premiers sont RGB, puis leur pourcentage de réfraction, 
+//de réflexion, puis s'ils sont lumineux (booléen).
 Materiau vert{0, .9, 0};
 Materiau vert_fonce{10. / 255, 65. / 255, 0};
 Materiau materiau_soleil{1, 1, .5, 0, 0, true};
 Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255};
 Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255};
 Materiau verre{1, 1, 1, .1, .9};
->>>>>>> refs/remotes/origin/main
 
 Materiau miroir{1, 1, 1, 0.9};
 
@@ -45,8 +32,7 @@ Vecteur normale_3{-1, 0, 0};
 Vecteur normale_4{0, -1, 0};
 Vecteur normale_5{0, 0, 1};
 
-// Vecteur point{0, 5, 0};
-// Vecteur normale{0, -1, .1};
+
 
 Plan plan{point, normale, rouge_fonce};
 Plan plan_2{point_2, normale_2, vert_fonce};
@@ -54,47 +40,44 @@ Plan plan_3{point_3, normale_3, vert_fonce};
 Plan plan_4{point_4, normale_4, bleu_fonce};
 Plan plafond{point_5, normale_5, materiau_soleil};
 
-<<<<<<< HEAD
 Sphere sphere(0, 8, 1, 1, miroir);
 Sphere s2(-.4, 6, 0.2, .2, vert_fonce);
 Sphere s3(0.5, 5, 0.4, 0.4, bleu_fonce);
-=======
-Sphere sphere(0, 8, 1, 1, verre);
-Sphere s2(-.4, 4, 1, .2);
->>>>>>> refs/remotes/origin/main
 Sphere soleil(8, 20, 12, 10, materiau_soleil);
 
-// objet contenant toute la scène 3d, (utiliser shared pointers ?)
+// L'objet union permet de définir la scène 3D : ici c'est la boîte de Cornell
 Union monde{&sphere, &plan, &plan_2, &plan_3, &plan_4, &s2, &s3, &plafond};
-// Union monde{&sphere, &s2};
-// Union monde{&plan};
 
-// Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
-//  Vecteur direction_lumiere{0, -1, 0};
+// Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil 
 Vecteur direction_lumiere{0, 0, 1}; // vecteur vers le plafond
 
+
+//Définition de l'aléatoire en dehors des fonctions qui l'utilisent.
 std::random_device rd_;
 std::mt19937 generator_(rd_()); // Mersenne Twister 19937 engine
 std::uniform_real_distribution<double> rand_double(0, 1);
 
 inline void colore_pixel(Vecteur couleur, int i, int j) {
-    // correction gamma
+    // correction gamma encouragée par le professeur
     if (correction_gamma) {
         couleur.x = sqrt(couleur.x) * 255;
         couleur.y = sqrt(couleur.y) * 255;
         couleur.z = sqrt(couleur.z) * 255;
     }
 
+    //Utilisation de SDL pour dessiner notre scène
     SDL_SetRenderDrawColor(renderer, (int)couleur.x, (int)couleur.y, (int)couleur.z, 255);
     SDL_RenderDrawPoint(renderer, j, i);
 }
 
+//Chaque ligne est colorée à son tour, ce qui permet de parralléliser.
 void colore_ligne(Vecteur couleurs[], int i, int largeur_ecran) {
     for (int j = 0; j < largeur_ecran; j++) {
         colore_pixel(couleurs[j], i, j);
     }
 }
 
+//Dans nos premières simulations, le ciel était d'un dégradé de bleu.
 Vecteur couleur_ciel(int i, int max_i) {
     // double k = (rayon.direction.y / rayon.direction.norme() + 1) / 2;
     double k = (double)i / max_i;
@@ -260,22 +243,4 @@ void Camera::image() {
     std ::cout << "fini \n";
 }
 
-// void Camera::image() {
 
-//     Vecteur vitesse = centre_ecran - position_camera;
-//     vitesse *= 1 / sqrt(vitesse * vitesse);
-//     Rayon rayon(position_camera, vitesse);
-
-//     std::cout << "ray " << rayon << "\n";
-//     std::cout << "sph " << sphere << "\n";
-
-//     Intersection intersection;
-//     // monde.calcul_intersection(rayon, intersection);
-
-//     Vecteur couleur = lance_rayon(rayon);
-
-//     // Vecteur couleur = couleur_sol;
-//     // l'intensité varie avec cos(angle(normale,lumiere))
-//     // couleur *= std::max(0., intersection.normale * direction_lumiere);
-//     std::cout << intersection.normale << couleur << "\n";
-// }
