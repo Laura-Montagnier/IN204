@@ -65,7 +65,7 @@ public:
     Materiau(const Vecteur couleur, double p_reflexion = 0., double p_transmission = 0., bool lumineux = false);
     Materiau(double r, double g, double b, double p_reflexion = 0., double p_transmission = 0., bool lumineux = false);
 
-    // Remarque pour plus tard : est-ce qu'il faudrait pas renvoyer des erreurs si on est en dehors de 0 et 258 ?
+    // Remarque pour plus tard : est-ce qu'il faudrait pas renvoyer des erreurs si on est en dehors de 0 et 255 ?
 
     Materiau(const Materiau &) = default;
 };

@@ -3,9 +3,12 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
+//On lance 20 rayons par pixels, qui disparaissent au bout de 10 rebonds sur les objets environnants.
 int nb_rayons = 20;
 int max_rebonds = 10;
 
+//Nos matériaux sont définis avec 6 champs : les trois premiers sont RGB, puis leur pourcentage de réfraction, 
+//de réflexion, puis s'ils sont lumineux (booléen).
 Materiau vert{0, .9, 0};
 Materiau vert_fonce{10. / 255, 65. / 255, 0};
 Materiau materiau_soleil{1, 1, .5, 0, 0, true};
@@ -13,13 +16,15 @@ Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255};
 Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255};
 Materiau verre{1, 1, 1, .1, .9};
 
-Materiau miroir{1, 1, 1, 1};
+Materiau miroir{1, 1, 1, 0.9};
+
+Materiau mat{1, 1, 1, 0};
 
 Vecteur point{0, 0, 0};
-Vecteur point_2{-2.5, 0, 0};
-Vecteur point_3{2.5, 0, 0};
-Vecteur point_4{0, 25, 0};
-Vecteur point_5{0, 0, 25};
+Vecteur point_2{-3.5, 0, 0};
+Vecteur point_3{3.5, 0, 0};
+Vecteur point_4{0, 15, 0};
+Vecteur point_5{0, 0, 3.5};
 
 Vecteur normale{0, 0, 1};
 Vecteur normale_2{1, 0, 0};
@@ -28,40 +33,49 @@ Vecteur normale_4{0, -1, 0};
 Vecteur normale_5{0, 0, 1};
 
 Plan plan{point, normale, rouge_fonce};
-Plan plan_2{point_2, normale_2, bleu_fonce};
+Plan plan_2{point_2, normale_2, vert_fonce};
 Plan plan_3{point_3, normale_3, vert_fonce};
-Plan plan_4{point_4, normale_4, vert_fonce};
+Plan plan_4{point_4, normale_4, bleu_fonce};
 Plan plafond{point_5, normale_5, materiau_soleil};
 
-Sphere sphere(0, 8, 1, 1, verre);
-Sphere s2(-.4, 4, 1, .2);
+Sphere sphere(0, 8, 1, 1, miroir);
+Sphere s2(-.4, 6, 0.2, .2, vert_fonce);
+Sphere s3(0.5, 5, 0.4, 0.4, bleu_fonce);
 Sphere soleil(8, 20, 12, 10, materiau_soleil);
 
-// objet contenant toute la scène 3d, (utiliser shared pointers ?)
-Union monde{&sphere, &plan, &plan_2, &plan_4, &s2, &soleil};
+// L'objet union permet de définir la scène 3D : ici c'est la boîte de Cornell
+Union monde{&sphere, &plan, &plan_2, &plan_3, &plan_4, &s2, &s3, &plafond};
 
+// Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil 
+Vecteur direction_lumiere{0, 0, 1}; // vecteur vers le plafond
+
+
+//Définition de l'aléatoire en dehors des fonctions qui l'utilisent.
 std::random_device rd_;
 std::mt19937 generator_(rd_()); // Mersenne Twister 19937 engine
 std::uniform_real_distribution<double> rand_double(0, 1);
 
 inline void colore_pixel(Vecteur couleur, int i, int j) {
+    // correction gamma encouragée par le professeur
     if (correction_gamma) {
         couleur.x = sqrt(couleur.x) * 255;
         couleur.y = sqrt(couleur.y) * 255;
         couleur.z = sqrt(couleur.z) * 255;
     }
 
+    //Utilisation de SDL pour dessiner notre scène
     SDL_SetRenderDrawColor(renderer, (int)couleur.x, (int)couleur.y, (int)couleur.z, 255);
     SDL_RenderDrawPoint(renderer, j, i);
 }
 
+//Chaque ligne est colorée à son tour, ce qui permet de parralléliser.
 void colore_ligne(Vecteur couleurs[], int i, int largeur_ecran) {
-    // Colore une ligne entière de l'image, granularité parallélisation 
     for (int j = 0; j < largeur_ecran; j++) {
         colore_pixel(couleurs[j], i, j);
     }
 }
 
+//Dans nos premières simulations, le ciel était d'un dégradé de bleu.
 Vecteur couleur_ciel(int i, int max_i) {
     double k = (double)i / max_i;
     k = std::max(k, 1.);
@@ -131,12 +145,8 @@ Camera::Camera() : position_camera(0, 0, 1),
 
 void Camera::image() {
     // crée la scène, à mettre dans une fonction
-    // direction_lumiere *= 1 / direction_lumiere.norme();
-    // plan.normale *= 1 / plan.normale.norme();
 
     std::cout << "camera.image()\n";
-
-    // std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
 
 #pragma omp parallel for schedule(dynamic, 10)
     for (int i = 0; i < hauteur_ecran; i += 1) {
@@ -170,24 +180,6 @@ void Camera::image() {
             }
             couleur *= 1. / nb_rayons;
 
-            // return
-            // if (intersection.existe) {
-            //     // couleur = rayon.couleur ...
-
-            //     if (affiche_normales) {
-            //         couleur = (intersection.normale + Vecteur(1, 1, 1)) * .5; // Visualise normales
-            //     } else {
-            //         couleur = intersection.materiau.couleur;
-            //         // l'intensité varie avec cos(angle(normale,lumiere))
-            //         // couleur *= std::max(0., intersection.normale * direction_lumiere);
-            //     }
-
-            // } else {
-            //     // couleur = get_ambiant_light ...
-            //     couleur = couleur_ciel(i, hauteur_ecran);
-            // }
-            // Vecteur couleur = intersection.existe * couleur_sol + !intersection.existe * couleur_ciel;
-
             couleurs_ligne[j] = couleur;
         }
 #pragma omp critical
@@ -202,22 +194,4 @@ void Camera::image() {
     std ::cout << "fini \n";
 }
 
-// void Camera::image() {
 
-//     Vecteur vitesse = centre_ecran - position_camera;
-//     vitesse *= 1 / sqrt(vitesse * vitesse);
-//     Rayon rayon(position_camera, vitesse);
-
-//     std::cout << "ray " << rayon << "\n";
-//     std::cout << "sph " << sphere << "\n";
-
-//     Intersection intersection;
-//     // monde.calcul_intersection(rayon, intersection);
-
-//     Vecteur couleur = lance_rayon(rayon);
-
-//     // Vecteur couleur = couleur_sol;
-//     // l'intensité varie avec cos(angle(normale,lumiere))
-//     // couleur *= std::max(0., intersection.normale * direction_lumiere);
-//     std::cout << intersection.normale << couleur << "\n";
-// }
