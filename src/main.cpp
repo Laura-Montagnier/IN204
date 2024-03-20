@@ -22,8 +22,6 @@ int main(int argc, const char *argv[]) {
     // calcul_intersection(rayon, plan, i);
     // std::cout<< i.existe << i << "\n";
 
-
-
     // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     // SDL_Rect rect;
     // rect.x = rect.y = rect.h = rect.w = 20;
@@ -31,8 +29,14 @@ int main(int argc, const char *argv[]) {
 
     updateRender();
 
+    // Capture the current screen into a surface
+    SDL_Surface *screenshot = SDL_CreateRGBSurface(0, WINDOW_WIDTH, WINDOW_HEIGHT, 32, 0, 0, 0, 0);
+    SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, screenshot->pixels, screenshot->pitch);
 
-    //Cette boucle sert à fermer la fenêtre en cliquant sur la petite croix.
+    IMG_SavePNG(screenshot, "out.png");
+    SDL_FreeSurface(screenshot);
+
+    // Cette boucle sert à fermer la fenêtre en cliquant sur la petite croix.
     while (SDL_PollEvent(&event)) { // Empties event poll
     }
 
@@ -42,9 +46,15 @@ int main(int argc, const char *argv[]) {
             switch (event.type) {
 
             case SDL_QUIT:
-            case SDL_KEYDOWN:
                 exit(0);
                 break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                case SDLK_ESCAPE:
+                case SDLK_q:
+                    exit(0);
+                    break;
+                }
             }
         }
     }

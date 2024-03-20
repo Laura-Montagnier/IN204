@@ -3,6 +3,7 @@
 const bool affiche_normales = false;
 const bool correction_gamma = true;
 
+<<<<<<< HEAD
 int nb_rayons = 500;
 int max_rebonds = 8;
 
@@ -16,6 +17,17 @@ Materiau vert_fonce{10. / 255, 65. / 255, 0.1, 0, false};
 Materiau materiau_soleil{1, 1, .5, 0, true};
 Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255, 0, false};
 Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255, 0, false};
+=======
+int nb_rayons = 20;
+int max_rebonds = 10;
+
+Materiau vert{0, .9, 0};
+Materiau vert_fonce{10. / 255, 65. / 255, 0};
+Materiau materiau_soleil{1, 1, .5, 0, 0, true};
+Materiau bleu_fonce{10. / 255, 10. / 255, 70. / 255};
+Materiau rouge_fonce{65. / 255, 10. / 255, 5. / 255};
+Materiau verre{1, 1, 1, .1, .9};
+>>>>>>> refs/remotes/origin/main
 
 Materiau miroir{1, 1, 1, 0.9};
 
@@ -42,9 +54,14 @@ Plan plan_3{point_3, normale_3, vert_fonce};
 Plan plan_4{point_4, normale_4, bleu_fonce};
 Plan plafond{point_5, normale_5, materiau_soleil};
 
+<<<<<<< HEAD
 Sphere sphere(0, 8, 1, 1, miroir);
 Sphere s2(-.4, 6, 0.2, .2, vert_fonce);
 Sphere s3(0.5, 5, 0.4, 0.4, bleu_fonce);
+=======
+Sphere sphere(0, 8, 1, 1, verre);
+Sphere s2(-.4, 4, 1, .2);
+>>>>>>> refs/remotes/origin/main
 Sphere soleil(8, 20, 12, 10, materiau_soleil);
 
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
@@ -52,16 +69,15 @@ Union monde{&sphere, &plan, &plan_2, &plan_3, &plan_4, &s2, &s3, &plafond};
 // Union monde{&sphere, &s2};
 // Union monde{&plan};
 
-//Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
-// Vecteur direction_lumiere{0, -1, 0};
+// Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
+//  Vecteur direction_lumiere{0, -1, 0};
 Vecteur direction_lumiere{0, 0, 1}; // vecteur vers le plafond
-
 
 std::random_device rd_;
 std::mt19937 generator_(rd_()); // Mersenne Twister 19937 engine
 std::uniform_real_distribution<double> rand_double(0, 1);
 
-void colore_pixel(Vecteur couleur, int i, int j) {
+inline void colore_pixel(Vecteur couleur, int i, int j) {
     // correction gamma
     if (correction_gamma) {
         couleur.x = sqrt(couleur.x) * 255;
@@ -71,6 +87,12 @@ void colore_pixel(Vecteur couleur, int i, int j) {
 
     SDL_SetRenderDrawColor(renderer, (int)couleur.x, (int)couleur.y, (int)couleur.z, 255);
     SDL_RenderDrawPoint(renderer, j, i);
+}
+
+void colore_ligne(Vecteur couleurs[], int i, int largeur_ecran) {
+    for (int j = 0; j < largeur_ecran; j++) {
+        colore_pixel(couleurs[j], i, j);
+    }
 }
 
 Vecteur couleur_ciel(int i, int max_i) {
@@ -100,11 +122,17 @@ Vecteur lance_rayon(Rayon &rayon) {
             break;
         }
 
-        if (intersection.materiau.lumineux) {
+        if (affiche_normales) {
+            couleur = (intersection.normale + Vecteur(1, 1, 1)) * .5; // Visualise normales
+            break;
+        }
 
-            couleur.x *= intersection.materiau.couleur.x;
-            couleur.y *= intersection.materiau.couleur.y;
-            couleur.z *= intersection.materiau.couleur.z;
+        Materiau mat = intersection.materiau;
+        if (mat.lumineux) {
+
+            couleur.x *= mat.couleur.x;
+            couleur.y *= mat.couleur.y;
+            couleur.z *= mat.couleur.z;
 
             // couleur *= 10.;
 
@@ -112,17 +140,36 @@ Vecteur lance_rayon(Rayon &rayon) {
         }
 
         // std::cout << intersection << "\n";
-        couleur.x *= intersection.materiau.couleur.x;
-        couleur.y *= intersection.materiau.couleur.y;
-        couleur.z *= intersection.materiau.couleur.z;
-        rayon.origine = intersection.point;
-        if (rand_double(generator_) <= intersection.materiau.p_reflexion) {
+        couleur.x *= mat.couleur.x;
+        couleur.y *= mat.couleur.y;
+        couleur.z *= mat.couleur.z;
+
+        double r = rand_double(generator_);
+        if (r <= mat.p_reflexion) {
             // reflexion
-            rayon.direction = rayon.direction - 2 * (rayon.direction * intersection.normale) * intersection.normale;
+            rayon.direction = direction_reflechie(rayon.direction, intersection.normale);
+            rayon.origine = intersection.point;
+        } else if (r <= mat.p_reflexion + mat.p_transmission) {
+            // transmission ou réflexion totale
+            rayon.direction = direction_refractee(rayon.direction, intersection.normale);
+            //     Vecteur d = direction_refractee(rayon.direction, intersection.normale);
+            //     if (rayon.direction * d > 0) {
+            //     // le rayon a bien été réfracté
+            //     // On sassure que le pt d'origine est bien de l'autre coté de la surface
+
+            //     // rayon.origine += intersection.distance * 3*epsilon * rayon.direction;
+            // rayon.origine += intersection.distance * (2*epsilon) * rayon.direction ;
+            //     rayon.direction = d;
+            //     }
+
+            // rayon.origine = intersection.point + (intersection.distance * (20 * epsilon) * rayon.direction);
+            rayon.origine = intersection.point + (intersection.distance * (5 * epsilon) * rayon.direction);
+
         } else {
             // diffusion
-            rayon.direction = diffusion_lambert(intersection.normale);
-            // couleur *= std::max(0., intersection.normale * direction_lumiere);
+            rayon.direction = direction_difusee(intersection.normale);
+            // couleur *= std::max(0., intersection.normale * rayon.direction);
+            rayon.origine = intersection.point;
         }
     }
 
@@ -149,9 +196,15 @@ void Camera::image() {
 
     // std::cout << "normale_plan*lumiere: " << plan.normale * direction_lumiere << "\n";
 
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic, 10)
     for (int i = 0; i < hauteur_ecran; i += 1) {
-        std::cout << i << "\n";
+        int id = omp_get_thread_num();
+        int num_threads = omp_get_num_threads();
+        if (id == 0) {
+            std::cout << "> " << (int)(100. * i / hauteur_ecran) << "%   \r";
+            std::flush(std::cout);
+        }
+        Vecteur couleurs_ligne[largeur_ecran];
         for (int j = 0; j < largeur_ecran; j += 1) {
             Vecteur point_ecran =
                 centre_ecran +
@@ -168,7 +221,9 @@ void Camera::image() {
 
             for (int k = 0; k < nb_rayons; k++) {
                 Rayon rayon(position_camera, vitesse);
-                // rayon.origine += k*1e-4* Vecteur(1, 0, 0); // TODO: remplacer par variation aléatoire
+                double dx = (rand_double(generator_) - .5) * taille_pixel;
+                double dy = (rand_double(generator_) - .5) * taille_pixel;
+                rayon.origine += dx * ecran_x + dy * ecran_y;
                 couleur += lance_rayon(rayon);
             }
             couleur *= 1. / nb_rayons;
@@ -190,8 +245,15 @@ void Camera::image() {
             //     couleur = couleur_ciel(i, hauteur_ecran);
             // }
             // Vecteur couleur = intersection.existe * couleur_sol + !intersection.existe * couleur_ciel;
+
+            couleurs_ligne[j] = couleur;
+        }
 #pragma omp critical
-            colore_pixel(couleur, i, j);
+        colore_ligne(couleurs_ligne, i, largeur_ecran);
+
+        if (id == 0) {
+            // même pas de différence de perf, et effet très classe
+            updateRender();
         }
     }
 
