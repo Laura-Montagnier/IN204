@@ -4,37 +4,16 @@ int main(int argc, const char *argv[]) {
 
     init();
     atexit(cleanup);
-
     updateRender();
-
-    // Set to ~60 fps.
-    // 1000 ms/ 60 fps = 1/16 s^2/frame
-    SDL_Delay(16);
 
     SDL_Event event;
-    updateRender();
 
     Camera camera;
     camera.image();
 
-    // Rayon rayon(0, 0, 0, 0, 0, 1);
-    // Intersection i;
-    // calcul_intersection(rayon, plan, i);
-    // std::cout<< i.existe << i << "\n";
-
-    // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    // SDL_Rect rect;
-    // rect.x = rect.y = rect.h = rect.w = 20;
-    // SDL_RenderDrawRect(renderer, &rect);
-
     updateRender();
 
-    // Capture the current screen into a surface
-    SDL_Surface *screenshot = SDL_CreateRGBSurface(0, WINDOW_WIDTH, WINDOW_HEIGHT, 32, 0, 0, 0, 0);
-    SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, screenshot->pixels, screenshot->pitch);
-
-    IMG_SavePNG(screenshot, "out.png");
-    SDL_FreeSurface(screenshot);
+    saveScreen();
 
     // Cette boucle sert à fermer la fenêtre en cliquant sur la petite croix.
     while (SDL_PollEvent(&event)) { // Empties event poll

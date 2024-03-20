@@ -32,6 +32,14 @@ void updateRender() {
     SDL_RenderPresent(renderer);
 }
 
+void saveScreen(){
+    // Capture the current screen into a surface
+    SDL_Surface *screenshot = SDL_CreateRGBSurface(0, WINDOW_WIDTH, WINDOW_HEIGHT, 32, 0, 0, 0, 0);
+    SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, screenshot->pixels, screenshot->pitch);
+
+    IMG_SavePNG(screenshot, "out.png");
+    SDL_FreeSurface(screenshot);
+}
 
 void cleanup_graphics() {
     SDL_DestroyRenderer(renderer);

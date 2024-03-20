@@ -27,9 +27,6 @@ Vecteur normale_3{-1, 0, 0};
 Vecteur normale_4{0, -1, 0};
 Vecteur normale_5{0, 0, 1};
 
-// Vecteur point{0, 5, 0};
-// Vecteur normale{0, -1, .1};
-
 Plan plan{point, normale, rouge_fonce};
 Plan plan_2{point_2, normale_2, bleu_fonce};
 Plan plan_3{point_3, normale_3, vert_fonce};
@@ -42,19 +39,12 @@ Sphere soleil(8, 20, 12, 10, materiau_soleil);
 
 // objet contenant toute la scène 3d, (utiliser shared pointers ?)
 Union monde{&sphere, &plan, &plan_2, &plan_4, &s2, &soleil};
-// Union monde{&sphere, &s2};
-// Union monde{&plan};
-
-// Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil (source ponctuelle à l'infini ?)
-//  Vecteur direction_lumiere{0, -1, 0};
-Vecteur direction_lumiere{0, 0, 1}; // vecteur vers le plafond
 
 std::random_device rd_;
 std::mt19937 generator_(rd_()); // Mersenne Twister 19937 engine
 std::uniform_real_distribution<double> rand_double(0, 1);
 
 inline void colore_pixel(Vecteur couleur, int i, int j) {
-    // correction gamma
     if (correction_gamma) {
         couleur.x = sqrt(couleur.x) * 255;
         couleur.y = sqrt(couleur.y) * 255;
@@ -66,17 +56,16 @@ inline void colore_pixel(Vecteur couleur, int i, int j) {
 }
 
 void colore_ligne(Vecteur couleurs[], int i, int largeur_ecran) {
+    // Colore une ligne entière de l'image, granularité parallélisation 
     for (int j = 0; j < largeur_ecran; j++) {
         colore_pixel(couleurs[j], i, j);
     }
 }
 
 Vecteur couleur_ciel(int i, int max_i) {
-    // double k = (rayon.direction.y / rayon.direction.norme() + 1) / 2;
     double k = (double)i / max_i;
     k = std::max(k, 1.);
     return Vecteur(200. / 255, 220. / 255, 255. / 255) * k + Vecteur(0. / 255, 100. / 255, 255. / 255) * (1 - k);
-    // return Vecteur(0./255, 0./255, 0./255) * k + Vecteur(0./255, 60./255, 80./255) * (1 - k);
 }
 
 Vecteur lance_rayon(Rayon &rayon) {
@@ -86,14 +75,6 @@ Vecteur lance_rayon(Rayon &rayon) {
         monde.calcul_intersection(rayon, intersection);
         if (!intersection.existe) {
             // Vecteur ciel = couleur_ciel(std::min(std::max(rayon.direction.z, 500.), 0.), 500);
-            // couleur.x *= ciel.x;
-            // couleur.y *= ciel.y;
-            // couleur.z *= ciel.z;
-
-            // couleur.x *= .5;
-            // couleur.y *= .7;
-            // couleur.z *= .9;
-
             couleur = Vecteur(0, 0, 0);
             break;
         }
@@ -105,17 +86,12 @@ Vecteur lance_rayon(Rayon &rayon) {
 
         Materiau mat = intersection.materiau;
         if (mat.lumineux) {
-
             couleur.x *= mat.couleur.x;
             couleur.y *= mat.couleur.y;
             couleur.z *= mat.couleur.z;
-
-            // couleur *= 10.;
-
             break;
         }
 
-        // std::cout << intersection << "\n";
         couleur.x *= mat.couleur.x;
         couleur.y *= mat.couleur.y;
         couleur.z *= mat.couleur.z;
@@ -128,18 +104,8 @@ Vecteur lance_rayon(Rayon &rayon) {
         } else if (r <= mat.p_reflexion + mat.p_transmission) {
             // transmission ou réflexion totale
             rayon.direction = direction_refractee(rayon.direction, intersection.normale);
-            //     Vecteur d = direction_refractee(rayon.direction, intersection.normale);
-            //     if (rayon.direction * d > 0) {
-            //     // le rayon a bien été réfracté
-            //     // On sassure que le pt d'origine est bien de l'autre coté de la surface
-
-            //     // rayon.origine += intersection.distance * 3*epsilon * rayon.direction;
-            // rayon.origine += intersection.distance * (2*epsilon) * rayon.direction ;
-            //     rayon.direction = d;
-            //     }
-
-            // rayon.origine = intersection.point + (intersection.distance * (20 * epsilon) * rayon.direction);
-            rayon.origine = intersection.point + (intersection.distance * (5 * epsilon) * rayon.direction);
+            // On s'assure que le rayon a bien traversé la surface
+            rayon.origine = intersection.point + (intersection.distance * (2 * epsilon) * rayon.direction);
 
         } else {
             // diffusion
@@ -165,7 +131,7 @@ Camera::Camera() : position_camera(0, 0, 1),
 
 void Camera::image() {
     // crée la scène, à mettre dans une fonction
-    direction_lumiere *= 1 / direction_lumiere.norme();
+    // direction_lumiere *= 1 / direction_lumiere.norme();
     // plan.normale *= 1 / plan.normale.norme();
 
     std::cout << "camera.image()\n";

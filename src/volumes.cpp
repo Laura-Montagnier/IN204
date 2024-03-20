@@ -1,12 +1,5 @@
 #include "volumes.hpp"
 
-
-template <typename T>
-int sign(T x) {
-    // -1, 0 ou 1
-    return (x > 0) - (x < 0);
-}
-
 // Opérations sur les vecteurs
 
 Vecteur Vecteur::operator+(const Vecteur autre) const { // Vecteur + Vecteur
@@ -109,8 +102,6 @@ bool Union::calcul_intersection(const Rayon &rayon, Intersection &intersection) 
 }
 
 bool Sphere::calcul_intersection(const Rayon &rayon, Intersection &intersection) const {
-    // std::cout << rayon << *this <<"\n";
-    // std::cout << "produit scalaire" << rayon.direction * sphere....? <<"\n";
 
     Vecteur D = rayon.direction;
     Vecteur O = rayon.origine;
@@ -123,18 +114,13 @@ bool Sphere::calcul_intersection(const Rayon &rayon, Intersection &intersection)
     double delta = b * b - 4 * a * c;
     double t;
 
-    // std::cout << a << "\n";
-    // std::cout << b << "\n";
-    // std::cout << c << "\n";
-    // std::cout << delta << "\n";
-
     if (delta < 0) {
-        // std::cout << "a\n" ;
         intersection.existe = false;
         return false;
     } else if (delta == 0) {
         t = -b / (2 * a);
-    } else { // delta < 0
+    } else {
+        // delta < 0
         if ((-b - sqrt(delta)) / (2 * a) > 0) {
             t = (-b - sqrt(delta)) / (2 * a);
         } else {
@@ -143,13 +129,12 @@ bool Sphere::calcul_intersection(const Rayon &rayon, Intersection &intersection)
         }
     }
 
-    // t *= 1 + epsilon;
     t *= 1 - epsilon;
 
     intersection.existe = true;
     intersection.point = O + t * D;
     intersection.direction = rayon.direction;
-    intersection.distance = t; //  D normalisé ?
+    intersection.distance = t;
     intersection.normale = (intersection.point - C) * (1 / R);
     intersection.materiau = materiau;
     return true;
@@ -174,8 +159,8 @@ bool Plan::calcul_intersection(const Rayon &rayon, Intersection &intersection) c
     intersection.existe = true;
     intersection.point = rayon.origine + t * rayon.direction;
     intersection.direction = rayon.direction;
-    intersection.normale = normale; // * -sign(normale * rayon.direction);
-    intersection.distance = t;      //  t / norme(vitesse) ?
+    intersection.normale = normale;
+    intersection.distance = t;
     intersection.materiau = materiau;
     return true;
 }
