@@ -46,10 +46,6 @@ Sphere soleil(8, 20, 12, 10, materiau_soleil);
 // L'objet union permet de définir la scène 3D : ici c'est la boîte de Cornell
 Union monde{&sphere, &plan, &plan_2, &plan_3, &plan_4, &s2, &s3, &plafond};
 
-// Vecteur direction_lumiere{0.5, -0.5, 1}; // vecteur pointant vers le soleil 
-Vecteur direction_lumiere{0, 0, 1}; // vecteur vers le plafond
-
-
 //Définition de l'aléatoire en dehors des fonctions qui l'utilisent.
 std::random_device rd_;
 std::mt19937 generator_(rd_()); // Mersenne Twister 19937 engine
@@ -58,17 +54,20 @@ std::uniform_real_distribution<double> rand_double(0, 1);
 inline void colore_pixel(Vecteur couleur, int i, int j) {
     // correction gamma encouragée par le professeur
     if (correction_gamma) {
-        couleur.x = sqrt(couleur.x) * 255;
-        couleur.y = sqrt(couleur.y) * 255;
-        couleur.z = sqrt(couleur.z) * 255;
+        couleur.x = sqrt(couleur.x);
+        couleur.y = sqrt(couleur.y);
+        couleur.z = sqrt(couleur.z);
     }
+    couleur.x *= 255;
+    couleur.y *= 255;
+    couleur.z *= 255;
 
     //Utilisation de SDL pour dessiner notre scène
     SDL_SetRenderDrawColor(renderer, (int)couleur.x, (int)couleur.y, (int)couleur.z, 255);
     SDL_RenderDrawPoint(renderer, j, i);
 }
 
-//Chaque ligne est colorée à son tour, ce qui permet de parralléliser.
+//Chaque ligne est colorée à son tour, ce qui permet de paralléliser.
 void colore_ligne(Vecteur couleurs[], int i, int largeur_ecran) {
     for (int j = 0; j < largeur_ecran; j++) {
         colore_pixel(couleurs[j], i, j);
@@ -144,14 +143,10 @@ Camera::Camera() : position_camera(0, 0, 1),
                    centre_ecran(position_camera + distance_ecran * direction_camera){};
 
 void Camera::image() {
-    // crée la scène, à mettre dans une fonction
 
-    std::cout << "camera.image()\n";
-
-#pragma omp parallel for schedule(dynamic, 10)
+#pragma omp parallel for schedule(dynamic, 4)
     for (int i = 0; i < hauteur_ecran; i += 1) {
         int id = omp_get_thread_num();
-        int num_threads = omp_get_num_threads();
         if (id == 0) {
             std::cout << "> " << (int)(100. * i / hauteur_ecran) << "%   \r";
             std::flush(std::cout);
@@ -190,8 +185,6 @@ void Camera::image() {
             updateRender();
         }
     }
-
-    std ::cout << "fini \n";
 }
 
 

@@ -6,7 +6,7 @@ int main(int argc, const char *argv[]) {
     atexit(cleanup);
     updateRender();
 
-    SDL_Event event;
+    std::cout << "Génération de l'image\n";
 
     Camera camera;
     camera.image();
@@ -15,6 +15,12 @@ int main(int argc, const char *argv[]) {
 
     saveScreen();
 
+    std ::cout << "Fini     \n\n";
+    std ::cout << "L'image a été sauvegardée dans le fichier 'out.png'\n";
+    std ::cout << "Appuyer sur ESC, Q ou la croix pour quitter la fenêtre\n";
+
+    SDL_Event event;
+    
     // Cette boucle sert à fermer la fenêtre en cliquant sur la petite croix.
     while (SDL_PollEvent(&event)) { // Empties event poll
     }
