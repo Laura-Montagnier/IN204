@@ -3,7 +3,6 @@
 SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Texture *display;
-TTF_Font *font;
 
 bool init_graphics() {
 
@@ -44,6 +43,4 @@ void saveScreen(){
 void cleanup_graphics() {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    TTF_CloseFont(font);
-    TTF_Quit();
 }

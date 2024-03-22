@@ -14,9 +14,9 @@ void init() {
         fail = true;
     }
 
-    if (TTF_Init() == -1) {
+    if (IMG_Init(IMG_INIT_PNG) == -1) {
         fprintf(stderr,
-                "\nTTF_Init Error:  %s\n",
+                "\nIMG_Init Error:  %s\n",
                 SDL_GetError());
         fail = true;
     }
@@ -37,9 +37,8 @@ void init() {
 void cleanup() {
     // Shuts down everything
     cleanup_graphics();
+    IMG_Quit();
     SDL_Quit();
 
     printf("Bye bye !\n\n");
-
-
 }
