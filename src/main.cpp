@@ -20,7 +20,7 @@ int main(int argc, const char *argv[]) {
     std ::cout << "Appuyer sur ESC, Q ou la croix pour quitter la fenêtre\n";
 
     SDL_Event event;
-    
+
     // Cette boucle sert à fermer la fenêtre en cliquant sur la petite croix.
     while (SDL_PollEvent(&event)) { // Empties event poll
     }
